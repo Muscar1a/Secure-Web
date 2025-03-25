@@ -23,27 +23,47 @@ body {
     border-radius: 30px;
     box-shadow: 0 0 30px rgba(0, 0, 0, .2);
     display: flex;
+    overflow: hidden;
 }
 
-.login-box {
+.form-box.login {
     position: absolute;
     right: 0;
     width: 50%;
     height: 100%;
-    background: seagreen;
+    background: white;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center form horizontally */
+    justify-content: center; 
     color: #333;
     text-align: center;
     padding:40px;
+    
+}
+
+.form-box {
+    position: absolute;
+    right:0;
+    width: 50px;
+    height:100%;
+    background: whtie;
+    display:flex;
+    align-items: center;
+    color: #333;
+    text-align: center;
+    padding: 40px;
+    z-index:1;
 }
 
 form {
-    width: 80%; /* Reduce width to fit better */
+    width: 80%; 
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.form-box.register {
+    visibility: hidden;
 }
 
 .container h1 {
@@ -59,7 +79,7 @@ form {
 
 .input-box input {
     width: 100%;
-    padding: 13px 45px 13px 15px; /* Leave space for icon */
+    padding: 13px 45px 13px 15px;
     background: #eee;
     border-radius: 8px;
     border: none;
@@ -103,3 +123,82 @@ form {
 }
 
 
+.social-icons ul{
+    display: flex;
+    margin-left: 35px;
+}
+
+.social-icons li{
+    font-size: 35px;
+    list-style: none;
+    padding-right: 30px;
+}
+
+.social-icons ul li a:hover,
+.social-icons ul li a:active{
+    color: pink;
+    transition: 2s;
+}
+
+.forgot-password a {
+    text-decoration: none;
+}
+
+.social-icons a {
+    display: inline-flex;
+    padding:10px;
+    border: 2px solid #ccc;
+    border-radius:8px;
+    font-size:24px;
+    color:#333;
+    text-decoration: none;
+    margin:0 8px;
+}
+
+.toggle-box::before {
+    content: '';
+    position: absolute;
+    left: -250%;
+    width: 300%;
+    height: 100%;
+    background: #7494ec;
+    z-index:2 ;
+    border-radius: 150px;
+
+}
+
+.toggle-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+}
+
+.toggle-panel {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    /* background: seagreen; */
+    display: flex;
+    flex-direction: column;
+    color:white;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+
+
+
+}
+
+.toggle-panel p {
+    margin-bottom: 20px;
+
+}
+
+.toggle-panel .btn {
+    width: 160px;
+    height:46px;
+    background: transparent;
+    border: 2px solid #fff;
+    box-shadow: none;
+}
