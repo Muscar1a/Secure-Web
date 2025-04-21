@@ -1,13 +1,27 @@
-from sqlalchemy.orm import Session
-from models.user import UserDB
+from typing import Optional
 from schemas.user import UserCreate
 from core.security import get_password_hash
 
-def get_user(db: Session, username: str):
-    return db.query(UserDB).filter(UserDB.username == username).first()
+async def get_user(db, username: str) -> Optional[dict]:
+    """
+    Fetch a user document by username.
+    """
+    return await db.users.find_one({"username": username})
 
-def create_user(db: Session, user_in: UserCreate):
+async def create_user(db, user_in: UserCreate) -> dict:
+    """
+    Create a new user document with hashed password and return it,
+    converting the MongoDB ObjectId to a string 'id' field.
+    """
     hashed_pw = get_password_hash(user_in.password)
-    db_user = UserDB(username=user_in.username, email=user_in.email, hashed_password=hashed_pw)
-    db.add(db_user); db.commit(); db.refresh(db_user)
-    return db_user
+    doc = {
+        "username": user_in.username,
+        "email": user_in.email,
+        "hashed_password": hashed_pw,
+        "is_active": True,
+    }
+    result = await db.users.insert_one(doc)
+    user_doc = await db.users.find_one({"_id": result.inserted_id})
+    # expose a string id instead of ObjectId
+    user_doc["id"] = str(user_doc["_id"])
+    return user_doc

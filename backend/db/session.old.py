@@ -1,3 +1,4 @@
+# old db that uses sqlalchemy. We now try migrate to mongodb
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from core.config import SQLALCHEMY_DATABASE_URL

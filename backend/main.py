@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db import base  # ensures all models are registered
-from db.session import engine
+#from db.session import engine
 from api.routers import auth, users
 
-# create tables
-base.Base.metadata.create_all(bind=engine)
+# create tables (old sqlalchemy code)
+#base.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
