@@ -1,0 +1,350 @@
+
+html, body, #root { 
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #211F26; 
+    color: #e0e0e0;
+  }
+  
+  .login-page {
+    background-color: #211F26; 
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; 
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #1A181F; 
+    flex-shrink: 0;
+    border-bottom: 1px solid #3a3740; 
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 600; 
+    color: #e0e0e0; 
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+  }
+  
+  .logo-icon {
+    font-size: 1.6rem; 
+    color: #D89E40; 
+  }
+  
+  .settings-button {
+    background: none;
+    border: none;
+    color: #b0b0b0; 
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+  }
+  
+  .settings-button:hover {
+      color: #e0e0e0;
+  }
+  
+  .settings-icon {
+     font-size: 1.1rem; 
+     color: #b0b0b0; 
+  }
+  .settings-button:hover .settings-icon {
+      color: #e0e0e0;
+  }
+  
+  
+  .main-content {
+    display: flex;
+    flex-grow: 1;
+    padding: 50px 40px;
+    gap: 60px; 
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .form-container {
+    flex: 1;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-icon-container {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .form-icon {
+    background-color: #2E2B36; 
+    color: #D89E40; 
+    padding: 12px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 1.6rem; 
+    line-height: 1; 
+  }
+  
+  .form-container h2 {
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .form-container .subtitle {
+    font-size: 0.95rem;
+    color: #a0a0a0; 
+    margin-bottom: 40px; 
+    display: flex;
+    justify-content: center;
+  }
+  
+  .form-container form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px; 
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .input-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #b0b0b0;
+  }
+  
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-wrapper .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8A888F; 
+    font-size: 1.1rem; 
+    pointer-events: none;
+  }
+  
+  .input-wrapper input {
+    width: 100%;
+    padding: 14px 15px 14px 50px; 
+    background-color: #2E2B36; 
+    border: 1px solid #4a4750; 
+    border-radius: 8px; 
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .input-wrapper input::placeholder {
+    color: #8A888F;
+  }
+  
+  .input-wrapper input:focus {
+    outline: none;
+    border-color: #D89E40;
+    box-shadow: 0 0 0 2px rgba(216, 158, 64, 0.3); 
+  }
+  
+  .input-wrapper input[type="password"],
+  .input-wrapper input[type="text"].password-input { 
+    padding-right: 45px;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8A888F;
+    cursor: pointer;
+    font-size: 1.1rem; 
+  }
+  
+  .password-toggle:hover {
+      color: #b0b0b0; 
+  }
+  
+  
+  .submit-button {
+    background-color: #D89E40; 
+    color: #211F26;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 8px; 
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 15px; 
+    width: 100%;
+  }
+  
+  .submit-button:hover {
+    background-color: #c9913a; 
+  }
+  
+  .submit-button:disabled {
+      background-color: #a87e3f;
+      cursor: not-allowed;
+  }
+  
+  
+  .signup-link { 
+    text-align: center;
+    margin-top: 30px; 
+    font-size: 0.9rem;
+    color: #a0a0a0; 
+  }
+  
+  .signup-link a {
+    color: #D89E40; 
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .signup-link a:hover {
+    color: #eab65f; 
+    text-decoration: underline;
+  }
+  
+  
+  .community-container {
+    flex: 1;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .community-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 320px; 
+    margin-bottom: 40px;
+  }
+  
+  .community-item {
+    background-color: #2E2B36; 
+    border-radius: 12px; 
+    aspect-ratio: 1 / 1;
+  }
+  
+  .community-container h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #ffffff;
+  }
+  
+  .community-container p {
+    font-size: 0.95rem;
+    color: #a0a0a0;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 300px; 
+  }
+  
+  .error-message {
+      background-color: rgba(255, 100, 100, 0.1); 
+      color: #ffcccc; 
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      padding: 12px 15px;
+      border-radius: 8px; 
+      margin-bottom: 25px; 
+      font-size: 0.9rem;
+      text-align: center;
+  }
+
+
+.community-item {
+    background-color: #2f2f2f; 
+    border-radius: 12px;
+    aspect-ratio: 1 / 1;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;  
+    color: #777;      
+
+  }
+  
+  
+  @media (max-width: 900px) {
+    .main-content {
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+      padding: 40px 30px;
+      overflow-y: auto;
+      justify-content: flex-start;
+    }
+    .form-container,
+    .community-container {
+       max-width: 450px;
+       width: 90%;
+       flex: none;
+    }
+    .community-container {
+        padding-top: 0;
+    }
+    .community-grid {
+        max-width: 300px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+      .header {
+          padding: 15px 20px;
+      }
+      .logo {
+          font-size: 1.3rem;
+      }
+      .main-content {
+          padding: 30px 20px;
+      }
+      .form-container h2 {
+          font-size: 1.7rem;
+      }
+      .community-container h3 {
+          font-size: 1.4rem;
+      }
+       .form-container,
+      .community-container {
+        width: 95%;
+      }
+  }
