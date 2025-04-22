@@ -15,6 +15,9 @@ cd frontend<br>
 npm install<br>
 npm start<br>
 
+# database start
+
+
 # some fixes
 "cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies..."<br>
 run this:<br>

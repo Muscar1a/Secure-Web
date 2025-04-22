@@ -44,7 +44,18 @@ const Register = () => {
       navigate('/login', { state: { message: 'Registration successful! Please login.' } });
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+    
+      if (err.response?.status === 422) {
+        // FastAPI sent back: { detail: [ { loc, msg, type }, ... ] }
+        const details = err.response.data.detail;
+        // Map to the human messages and join into one string
+        const messages = Array.isArray(details)
+          ? details.map(e => e.msg).join('; ')
+          : String(details);
+        setError(messages);
+      } else {
+        setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
