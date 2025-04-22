@@ -5,6 +5,8 @@ import Login from './components/pages/LoginPage';
 import Register from './components/pages/RegisterPage';
 import ChatPage from './components/pages/ChatPage';
 import PrivateRoute from './components/PrivateRoute';
+import NavBar from './components/elements/Navbar';
+
 
 
 
@@ -12,7 +14,7 @@ function App() {
   return (
     <div>
     <AuthProvider>
-  
+      <NavBar/>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
