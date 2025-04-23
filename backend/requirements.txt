@@ -2,7 +2,10 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
+pydantic_settings
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 motor
+bson
+pydantic[email]

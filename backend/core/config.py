@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class GlobalSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    ENVIRONTMENT: str = "development"
+    ENVIRONMENT: str = "development"
     # app settings
     ALLOWED_ORIGINS: str = "http://127.0.0.1:3000,http://localhost:3000"
 
@@ -25,6 +25,15 @@ class GlobalSettings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # SMTP
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    EMAIL_FROM: str
+
+    # Password-reset URL
+    FRONTEND_URL: str 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./chatapp.db"
 
 def get_settings():
