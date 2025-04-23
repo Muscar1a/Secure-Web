@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, UUID4
 
 class UserBase(BaseModel):
     username: str
@@ -8,8 +8,8 @@ class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
-    id: str
+    id: UUID4
     is_active: bool
     class Config:
         orm_mode = True
-
+        from_attributes = True

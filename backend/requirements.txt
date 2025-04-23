@@ -6,3 +6,7 @@ python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 motor
+redis
+pydantic-settings
+jwt
+beanie

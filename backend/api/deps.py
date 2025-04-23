@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from schemas.token import TokenData
 from crud.users import get_user
 from core.config import SECRET_KEY, ALGORITHM
-from db.mongo import mongodb
+from db.database import mongodb
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 

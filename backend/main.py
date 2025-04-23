@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db import base  # ensures all models are registered
 #from db.session import engine
-from api.routers import auth, users
+from api.routers import auth, users #, chat
 
 # create tables (old sqlalchemy code)
 #base.Base.metadata.create_all(bind=engine)
@@ -17,5 +17,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
-
+# app.include_router(chat.router)
 #run: uvicorn main:app --reload
+
+
