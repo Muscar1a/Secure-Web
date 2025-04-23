@@ -43,7 +43,7 @@ const LoginView = ({
   
             <form onSubmit={handleSubmit}>
               <div className="input-group">
-                <label htmlFor="login-username">Email</label> 
+                <label htmlFor="login-username">Username</label> 
                 <div className="input-wrapper">
                    {typeof MdOutlineMailOutline !== 'undefined' && <MdOutlineMailOutline className="input-icon" />} {/* Email Icon */}
                    <input
