@@ -1,9 +1,34 @@
-from datetime import timedelta
+import logging
+import os
+from random import randint
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-SECRET_KEY = "IT‑E15"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+class GlobalSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    ENVIRONTMENT: str = "development"
+    # app settings
+    ALLOWED_ORIGINS: str = "http://127.0.0.1:3000,http://localhost:3000"
+
+    # Logging
+    LOG_LEVEL: int = logging.DEBUG
+
+    # Sentry
+    SENTRY_DSN: str = ""
+
+    # MongoDB
+    MONGODB_URL: str = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
+    MONGODB_DB_NAME: str = "chatapp" 
+    
+    # Authentication
+    SECRET_KEY: str = "IT‑E15"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./chatapp.db"
-MONGODB_URL = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
-MONGODB_DB_NAME = "chatapp" 
+
+def get_settings():
+    env = os.environ.get("ENVIRONMENT", "development")
+    return GlobalSettings()
+
+settings = get_settings()

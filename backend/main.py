@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from db import base  # ensures all models are registered
+from db import database  # ensures all models are registered
 #from db.session import engine
 from api.routers import auth, users
 

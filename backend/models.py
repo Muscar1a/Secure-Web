@@ -1,5 +1,12 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from db.base import Base
+from db.database import Base
+import enum
+import uuid
+
+class ChatType(enum.Enum):
+    DIRECT = "direct"
+    GROUP = "group"
+
 
 class UserDB(Base):
     __tablename__ = "users"

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.user import UserDB
+from backend.models import UserDB
 from schemas.user import UserCreate
 from core.security import get_password_hash
 
