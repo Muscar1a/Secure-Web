@@ -1,0 +1,233 @@
+/* Basic Reset & Font */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif; /* Use a specific font if you have one */
+    height: 100%;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* Define Theme Colors */
+:root {
+    --bg-color: #2c2521; /* Dark brown background */
+    --text-color: #e0d8d1; /* Light beige text */
+    --accent-color: #b89a74; /* Gold/brown accent */
+    --secondary-text-color: #8a817a; /* Dimmer text for status/instructions */
+    --divider-color: #4a413b;
+    --icon-bg-color: #4a413b; /* Background for welcome icon */
+    --avatar-border-color: #5a514b;
+}
+
+/* Overall Page Layout */
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden; /* Prevent body scroll */
+}
+
+/* Header Styles */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: var(--bg-color); /* Same as page or slightly different */
+    border-bottom: 1px solid var(--divider-color); /* Optional subtle divider */
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.header-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.header-nav {
+    display: flex;
+    gap: 25px; /* Space between nav items */
+}
+
+.nav-item {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.nav-item:hover {
+    color: var(--accent-color);
+}
+
+/* Main Content Area (Sidebar + Chat) */
+.chat-main {
+    display: flex;
+    flex-grow: 1; /* Take remaining vertical space */
+    overflow: hidden; /* Prevent content overflow issues */
+    height: calc(100vh - 61px); /* Adjust based on actual header height */
+}
+
+/* Sidebar Styles */
+.chat-sidebar {
+    width: 280px; /* Adjust width as needed */
+    border-right: 1px solid var(--divider-color);
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0; /* Padding top/bottom, zero left/right for full-width items */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    overflow-y: auto; /* Allow scrolling only if content overflows */
+}
+
+.sidebar-header {
+    font-size: 1.1em;
+    padding: 0 20px 15px 20px; /* Add horizontal padding */
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+}
+
+.sidebar-icon {
+    color: var(--accent-color); /* Use accent color for icon */
+    font-size: 1.2em;
+}
+
+.sidebar-filter {
+    padding: 10px 20px;
+    font-size: 0.9em;
+    color: var(--secondary-text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-filter input[type="checkbox"] {
+    /* Basic styling, can be customized further */
+    cursor: pointer;
+}
+
+/* Contact List */
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    flex-grow: 1; /* Allows list to take space for scrolling */
+    overflow-y: auto; /* Enable scrolling within the list if needed */
+    /* Hide scrollbar visually (optional, depends on browser) */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--accent-color) var(--bg-color); /* Firefox */
+}
+
+/* Webkit scrollbar styling */
+.contact-list::-webkit-scrollbar {
+  width: 6px;
+}
+.contact-list::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+.contact-list::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.contact-item:hover {
+    background-color: var(--divider-color); /* Subtle hover effect */
+}
+
+.contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 1px solid var(--avatar-border-color); /* Optional subtle border */
+    object-fit: cover; /* Ensure image covers the area */
+    background-color: var(--secondary-text-color); /* Placeholder bg */
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-name {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+.contact-status {
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+}
+
+/* Message shown in sidebar when list is loading/empty/error */
+.sidebar-message {
+    padding: 20px;
+    text-align: center;
+    color: var(--secondary-text-color);
+    font-style: italic;
+}
+.sidebar-message.error {
+    color: #ff6b6b; /* Example error color */
+    font-style: normal;
+    font-weight: bold;
+}
+
+
+/* Chat Area Styles */
+.chat-area {
+    flex-grow: 1; /* Take remaining horizontal space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center welcome message vertically */
+    align-items: center; /* Center welcome message horizontally */
+    padding: 30px;
+    overflow-y: auto; /* Allow scrolling for actual chat content later */
+}
+
+/* Welcome Message Styles */
+.welcome-message {
+    text-align: center;
+    color: var(--secondary-text-color);
+}
+
+.welcome-icon {
+    font-size: 2.5em; /* Adjust size */
+    background-color: var(--icon-bg-color);
+    color: var(--accent-color);
+    width: 70px; /* Fixed size */
+    height: 70px; /* Fixed size */
+    border-radius: 15px; /* Rounded corners */
+    display: inline-flex; /* Use inline-flex for centering content */
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.welcome-title {
+    font-size: 1.5em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.welcome-instruction {
+    font-size: 0.95em;
+}
+
+/* Add styles for actual chat messages, input fields etc. when needed */
