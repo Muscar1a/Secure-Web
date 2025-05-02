@@ -8,7 +8,7 @@ class GlobalSettings(BaseSettings):
 
     ENVIRONMENT: str = "development"
     # app settings
-    ALLOWED_ORIGINS: str = "http://127.0.0.1:3000,http://localhost:3000"
+    ALLOWED_ORIGINS: str 
 
     # Logging
     LOG_LEVEL: int = logging.DEBUG
@@ -17,12 +17,12 @@ class GlobalSettings(BaseSettings):
     SENTRY_DSN: str = ""
 
     # MongoDB
-    MONGODB_URL: str = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
-    MONGODB_DB_NAME: str = "chatapp" 
+    MONGODB_URL: str 
+    MONGODB_DB_NAME: str
     
     # Authentication
-    SECRET_KEY: str = "IT‑E15"
-    ALGORITHM: str = "HS256"
+    SECRET_KEY: str
+    ALGORITHM: str 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # SMTP
