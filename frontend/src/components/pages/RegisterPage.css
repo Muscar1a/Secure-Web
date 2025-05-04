@@ -213,26 +213,24 @@ body {
 }
 
 
-.signin-link {
+.signin-link { 
   text-align: center;
-  margin-top: 25px;
+  margin-top: 30px; 
   font-size: 0.9rem;
-  color: #a0a0a0;
+  color: #a0a0a0; 
 }
 
 .signin-link a {
-  color: #cfa14a;
+  color: #D89E40; 
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .signin-link a:hover {
-  color: #e4b96c;
+  color: #eab65f; 
   text-decoration: underline;
 }
-
-
 
 .community-container {
   flex: 1; 
