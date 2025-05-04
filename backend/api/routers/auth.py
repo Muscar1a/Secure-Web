@@ -39,6 +39,7 @@ async def login_for_access_token(
     access_token = create_access_token({"sub": user["username"]})
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 class PasswordResetRequest(BaseModel):
     email: EmailStr
 
@@ -100,3 +101,11 @@ async def reset_password(
     hashed = get_password_hash(req.new_password)
     await update_user_password(db, str(user["_id"]), hashed)
     return {"msg": "Password has been reset successfully."}
+
+
+@router.get("/logout")
+async def logout():
+    """
+    Logs out the user by invalidating the token (client-side action).
+    """
+    return {"msg": "Logged out successfully. Please delete the token from your client."}

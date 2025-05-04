@@ -3,15 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import auth, users, message
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import settings
-import socketio
+from fastapi_socketio import SocketManager
+
 
 app = FastAPI()
 mongodb = None
 
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="http://localhost:3000")
-socket_manager = socketio.ASGIApp(socketio_server=sio, other_asgi_app=app, socketio_path="/ws/socket.io")
-
-app.mount("/ws/socket.io", socket_manager)
+socket_manager = SocketManager(app=app, async_mode="asgi")
 
 online_users = {}
 
@@ -36,33 +34,34 @@ async def startup_db_client():
     print("Connected to MongoDB")
 
 
-@sio.event
-async def connect(sid, environ):
+@socket_manager.on("connect")
+async def handle_connect(sid, environ):
     print(f"Client connected: {sid}")
     
 
-@sio.event
-async def add_user(sid, user_id):
+@socket_manager.on("add-user")
+async def handle_add_user(sid, user_id):
     user_id_list = online_users.get(user_id, [])
     user_id_list.append(sid)
     online_users[user_id] = user_id_list
+    
 
-@sio.event
-async def send_message(sid, data):
+@socket_manager.on("send-message")
+async def send_msg(sid, data):
     send_user_sockets = online_users.get(data["sender"], None)
     if send_user_sockets:
         for user_socket in send_user_sockets:
-            await sio.emit("msg-recieve", data, to=user_socket)
+            await socket_manager.emit("msg-recieve", data, to=user_socket)
             
             
 
-@sio.event
+@socket_manager.on("tag-msg")
 async def react_msg(sid, data):
     await message.tag_message(message_id=data["message_id"], tag=data["tag"])
     send_user_sockets = online_users.get(data["sender"], None)
     if send_user_sockets:
         for user_socket in send_user_sockets:
-            await sio.emit("tag-recieve", data, to=user_socket)
+            await socket_manager.emit("tag-recieve", data, to=user_socket)
 
 
 
