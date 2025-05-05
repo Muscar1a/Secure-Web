@@ -10,11 +10,10 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { host } from '../../utils/APIRoutes';
 import axios from 'axios';
-import { allUsersRoute } from '../../utils/APIRoutes';
+import {allUsersRoute} from '../../utils/APIRoutes';
 import Contacts from '../elements/Contacts';
-
-import ChatContainer from '../elements/ChatContainer';
-import Welcome from '../elements/Welcome';
+// import ChatContainer from '../elements/ChatContainer';
+// import Welcome from '../elements/Welcome';
 
 
 const ChatPage = () => {
@@ -25,7 +24,7 @@ const ChatPage = () => {
   const [currentUser, setCurrentUser] = React.useState(undefined);
   const [currentChat, setCurrentChat] = React.useState(undefined);
 
-  // console.log('Before contacts:', typeof contacts);
+  
   useEffect(() => {
     const checkUser = async () => {
       const storedUser = localStorage.getItem('user');
@@ -35,11 +34,11 @@ const ChatPage = () => {
         setCurrentUser(JSON.parse(storedUser));
       }
     };
-
+  
     checkUser();
   }, []);
 
-
+  
   useEffect(() => {
     if (currentUser) {
       socket.current = io(host, {
@@ -72,24 +71,50 @@ const ChatPage = () => {
       }
     };
   }, [currentUser]);
+  
 
-
+  /*
   useEffect(() => {
     const fetchContacts = async () => {
       if (currentUser) {
-        const response = await axios.get(`${allUsersRoute}/${currentUser.id}`);
-        // console.log('API response:', response.data);
-        setContacts(response.data.users);
+        try {
+          const data = await axios.get(`${allUsersRoute}/${currentUser.id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          setContacts(data.data.users);
+        } catch (error) {
+          console.error("Error fetching contacts:", error);
+          setContacts([]);
+        }
       }
     };
     fetchContacts();
   }, [currentUser]);
+  */
 
+  useEffect(() => {
+    const fetchContacts = async () => {
+      if (currentUser) {
+        try {
+          const response = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+          console.log('API response:', response.data);
+          setContacts(response.data);
+        } catch (error) {
+          console.error('Error fetching contacts:', error);
+          setContacts([]);
+        }
+      }
+    };
+    fetchContacts();
+  }, [currentUser]);
+ 
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
   };
 
-  // console.log('Contacts:', contacts);
+  
   const renderContactList = () => {
     if (contacts.length === 0) {
       return <div className="sidebar-message">No contacts available.</div>;
@@ -97,21 +122,19 @@ const ChatPage = () => {
 
     return (
       <Contacts
-        contacts={contacts}
+        contact={contacts}
         currentUser={currentUser}
         changeChat={handleChatChange}
       />
-    );
-
+    )
   };
-
+  
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;
   }
 
   const userName = user?.username || user?.name || 'User';
-
 
   return (
     <div className="chat-page">
@@ -121,7 +144,7 @@ const ChatPage = () => {
           TriSec
         </div>
 
-
+      
 
         <nav className="header-nav">
           <button className="nav-item">
@@ -144,11 +167,11 @@ const ChatPage = () => {
           </div>
           <div className="sidebar-filter">
             <input type="checkbox" id="show-online" />
-            {/* <label htmlFor="show-online">Show online only</label> */}
+            <label htmlFor="show-online">Show online only</label>
           </div>
           <ul className="contact-list">
             {renderContactList()}
-          </ul>
+          </ul> 
         </aside>
 
         <section className="chat-area">
@@ -157,15 +180,7 @@ const ChatPage = () => {
               <BsChatSquare />
             </div>
             <h2 className="welcome-title">
-              <Welcome />
-              
-              {currentChat === undefined ? (
-                <Welcome />
-              ) : (
-                <ChatContainer currentChat={currentChat} socket={socket} />
-              )}
-              
-              {/* Welcome to TriSec{user ? `, ${userName}` : ''}! */}
+              Welcome to TriSec{user ? `, ${userName}` : ''}!
             </h2>
             <p className="welcome-instruction">
               Select a conversation from the sidebar to start chatting
