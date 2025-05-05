@@ -1,5 +1,7 @@
+from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from models.user import User
 from schemas.token import Token
 from crud.auth import authenticate_user
 from core.security import (
@@ -101,6 +103,35 @@ async def reset_password(
     hashed = get_password_hash(req.new_password)
     await update_user_password(db, str(user["_id"]), hashed)
     return {"msg": "Password has been reset successfully."}
+
+
+@router.get("/allusers/{user_id}", response_model=dict)
+async def get_all_users(user_id: str, db = Depends(get_db)):
+    """
+    Retrieve all users except the current user.
+    """
+    try:
+        # Validate ObjectId
+        if not ObjectId.is_valid(user_id):
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+
+        # Fetch all users except the current user
+        users = await db.users.find({"_id": {"$ne": ObjectId(user_id)}}).to_list()
+        
+        # Serialize users to match Pydantic model
+        serialized_users = [
+            {
+                "_id": str(user["_id"]),
+                "username": user["username"],
+                "email": user["email"],
+                "is_active": user["is_active"]
+            }
+            for user in users
+        ]
+        
+        return {"users": serialized_users}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
 
 
 @router.get("/logout")

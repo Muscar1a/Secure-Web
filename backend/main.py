@@ -9,9 +9,9 @@ app = FastAPI()
 mongodb = None
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="http://localhost:3000")
-socket_manager = socketio.ASGIApp(socketio_server=sio, other_asgi_app=app, socketio_path="/ws/socket.io")
+socket_manager = socketio.ASGIApp(socketio_server=sio, other_asgi_app=app, socketio_path="/socket.io")
 
-app.mount("/ws/socket.io", socket_manager)
+app.mount("/socket.io", socket_manager)
 
 online_users = {}
 
