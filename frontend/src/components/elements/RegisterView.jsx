@@ -39,9 +39,6 @@ const RegisterView = ({
 
             <main className='main-content'>
                 <div className='form-container'>
-                    <div className="form-icon-container">
-                        <BsChatSquareDots className="form-icon" />
-                    </div>
                     <h2>Create Account</h2>
                     <p className="subtitle">Get started with your free account</p>
 
@@ -125,11 +122,12 @@ const RegisterView = ({
                         <button type="submit" className="submit-button" disabled={loading}>
                             {loading ? 'Creating Account...' : 'Create Account'}
                         </button>
+                        <span className='signin-link'>
+                        Already have an account? <Link to="/login">Sign in</Link>
+                    </span>
                     </form>
 
-                    <div className='signin-link'>
-                        Already have an account? <Link to="/login">Sign in</Link>
-                    </div>
+
                 </div>
 
                 <div className="community-container">
