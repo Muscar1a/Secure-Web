@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import styled from "styled-components";
 import ChatInput from "./ChatInput";
 import TagPicker from "./TagPicker";
@@ -18,20 +18,34 @@ export default function ChatContainer({ currentChat, socket }) {
 
   console.log("Current chat:", data);
   useEffect(() => {
-    async function getAllMessages() {
-      const data = await JSON.parse(
-        localStorage.getItem('user')
-      );
-      const response = await axios.post(recieveMessageRoute, {
-        sender: data._id,
-        receiver: currentChat._id,
-      });
-      setMessages(response.data);
-      setShouldScroll(true);
-    }
-
+    let mounted = true;
+  
+    const getAllMessages = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user?._id || !currentChat?._id) return;
+  
+        const response = await axios.post(recieveMessageRoute, {
+          sender: user._id,
+          receiver: currentChat._id,
+        });
+  
+        if (mounted) {
+          setMessages(response.data);
+          setShouldScroll(true);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+  
     getAllMessages();
-  }, [currentChat]);
+  
+    return () => {
+      mounted = false;
+    };
+  }, [currentChat?._id]);
+  
 
   useEffect(() => {
     const getCurrentChat = async () => {
@@ -44,46 +58,34 @@ export default function ChatContainer({ currentChat, socket }) {
     getCurrentChat();
   }, [currentChat]);
 
-  const handleSendMsg = async (msg) => {
-    const data = await JSON.parse(
-      localStorage.getItem('user')
-    );
-
-    const res = await axios.post(sendMessageRoute, {
-      sender: data._id,
-      receiver: currentChat._id,
-      message: msg,
-    });
-
-    socket.current.emit("send-msg", {
-      sender: currentChat._id,
-      receiver: data._id,
-      message: msg,
-      message_id: res.data.message_id,
-    });
-
-    const msgs = [...messages];
-    msgs.push({
-      fromSelf: true,
-      message: msg,
-      message_id: res.data.message_id,
-    });
-    setMessages(msgs);
-    setShouldScroll(true);
-  };
-
-  useEffect(() => {
-    if (socket.current) {
-      socket.current.on("msg-recieve", (data) => {
-        setArrivalMessage({
-          fromSelf: false,
-          message: data.message,
-          message_id: data.message_id,
-        });
-        setShouldScroll(true);
+  const handleSendMsg = useCallback(async (msg) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user?._id || !currentChat?._id) return;
+  
+      const res = await axios.post(sendMessageRoute, {
+        sender: user._id,
+        receiver: currentChat._id,
+        message: msg,
       });
+  
+      socket.current?.emit("send-msg", {
+        sender: user._id,
+        receiver: currentChat._id,
+        message: msg,
+        message_id: res.data.message_id,
+      });
+  
+      setMessages(prev => [...prev, {
+        fromSelf: true,
+        message: msg,
+        message_id: res.data.message_id,
+      }]);
+      setShouldScroll(true);
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  }, [socket]);
+  }, [currentChat?._id, socket]);
 
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);

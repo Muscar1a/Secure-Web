@@ -157,8 +157,6 @@ const ChatPage = () => {
               <BsChatSquare />
             </div>
             <h2 className="welcome-title">
-              <Welcome />
-              
               {currentChat === undefined ? (
                 <Welcome />
               ) : (
@@ -167,9 +165,6 @@ const ChatPage = () => {
               
               {/* Welcome to TriSec{user ? `, ${userName}` : ''}! */}
             </h2>
-            <p className="welcome-instruction">
-              Select a conversation from the sidebar to start chatting
-            </p>
           </div>
         </section>
       </main>

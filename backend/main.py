@@ -28,13 +28,14 @@ app.include_router(users.router)
 app.include_router(message.router, prefix="/messages", tags=["Messages"])
 
 
+"""
 @app.on_event("startup")
 async def startup_db_client():
     global mongodb
     client = AsyncIOMotorClient(settings.MONGODB_URL)
     mongodb = client[settings.MONGODB_DB_NAME]
     print("Connected to MongoDB")
-
+"""
 
 @sio.event
 async def connect(sid, environ):

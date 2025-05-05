@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-sqlalchemy
 pydantic
 pydantic_settings
 python-jose[cryptography]

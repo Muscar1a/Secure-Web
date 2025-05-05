@@ -17,8 +17,8 @@ class GlobalSettings(BaseSettings):
     SENTRY_DSN: str = ""
 
     # MongoDB
-    MONGODB_URL: str 
-    MONGODB_DB_NAME: str
+    MONGODB_URL: str = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
+    MONGODB_DB_NAME: str = "chatapp"
     
     # Authentication
     SECRET_KEY: str
