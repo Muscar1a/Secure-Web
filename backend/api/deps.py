@@ -2,10 +2,13 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
+from crud.user import User, get_user
+from db.mongo import get_db
 from schemas.token import TokenData
-from crud.users import get_user
 from core.config import settings
 from models.user import User
+from motor.motor_asyncio import AsyncIOMotorDatabase
+import schemas
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
@@ -39,3 +42,8 @@ async def get_current_user(
     user_dict = user.dict()
     user_dict.pop("hashed_password", None)
     return User(**user_dict)
+
+
+# Dependency to create a User instance
+async def get_user_manager(db: AsyncIOMotorDatabase = Depends(get_db)):
+    return User(db)

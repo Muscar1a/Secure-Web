@@ -1,5 +1,5 @@
 from core.security import verify_password
-from crud.users import get_user
+from backend.crud.user import get_user
 from models.user import User
 from typing import Optional
 

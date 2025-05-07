@@ -2,22 +2,41 @@ from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 from typing import Optional
 from bson import ObjectId
+from schemas.chat import MessageRecipient
+from core.utils import (
+    get_uuid4,
+    datetime_now,
+)
 
-class User(Document):
-    username: str = Indexed(str, unique=True)
-    email: EmailStr = Indexed(unique=True)
-    password: str
+class UserModel(Document):
+    id: str = Field(default_factory=get_uuid4)
+    first_name: str | None = Field(None, max_length=100)
+    last_name: str | None = Field(None, max_length=100)
+    username: str = Field(..., max_length=20)
+    email: EmailStr = Field(..., max_length=50)
+    password: str = Field(...) 
+    
     is_active: bool = True
+    is_disabled: bool = False     
+    is_superuser: bool = False               
+    private_message_recipients: list[MessageRecipient | None] = Field([])
+    group_chat_ids: list[str | None] = Field([])
 
-    class Settings:
-        name = "users"
 
     class Config:
+        # allow_population_by_field_name = True
         schema_extra = {
             "example": {
+                "id": "00010203-0405-0607-0809-0a0b0c0d0e0f",
+                "first_name": "John",
+                "last_name": "Doe",
                 "username": "johndoe",
                 "email": "johndoe@example.com",
-                "password": "hashed_password",
-                "is_active": True,
+                "password": "password123",
+                "active": True
             }
         }
+    
+    @classmethod
+    def __repr__(cls):
+        return f'{cls.first_name}'

@@ -15,7 +15,7 @@ from core.security import (
 )
 
 from core.email import send_reset_email
-from crud.users import get_user_by_email, update_user_password
+from backend.crud.user import get_user_by_email, update_user_password
 
 router = APIRouter(
     prefix="/auth",

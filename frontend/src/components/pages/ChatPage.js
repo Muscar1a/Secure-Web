@@ -7,14 +7,9 @@ import { CgProfile } from "react-icons/cg";
 import { BiLogOut } from "react-icons/bi";
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import { host } from '../../utils/APIRoutes';
 import axios from 'axios';
 import { allUsersRoute } from '../../utils/APIRoutes';
-import Contacts from '../elements/Contacts';
-
-import ChatContainer from '../elements/ChatContainer';
-import Welcome from '../elements/Welcome';
 
 
 const ChatPage = () => {
@@ -40,39 +35,6 @@ const ChatPage = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (currentUser) {
-      socket.current = io(host, {
-        path: "/socket.io",
-        transports: ["websocket", "polling"]
-      });
-      socket.current.emit("add-user", currentUser._id);
-
-      // Listen for user-connected event to update contacts
-      socket.current.on("user-connected", (userData) => {
-        setContacts((prevContacts) => {
-          // Avoid duplicates by checking if user already exists
-          if (!prevContacts.some(contact => contact._id === userData._id)) {
-            return [...prevContacts, userData];
-          }
-          return prevContacts;
-        });
-      });
-
-      return () => {
-        if (socket.current) {
-          socket.current.disconnect();
-        }
-      };
-
-    }
-    return () => {
-      if (socket.current) {
-        socket.current.disconnect();
-      }
-    };
-  }, [currentUser]);
-
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -94,14 +56,6 @@ const ChatPage = () => {
     if (contacts.length === 0) {
       return <div className="sidebar-message">No contacts available.</div>;
     }
-
-    return (
-      <Contacts
-        contacts={contacts}
-        currentUser={currentUser}
-        changeChat={handleChatChange}
-      />
-    );
 
   };
 
@@ -153,7 +107,7 @@ const ChatPage = () => {
 
         <section className="chat-area">
           <div className="welcome-message">
-            <div className="welcome-icon">
+            {/* <div className="welcome-icon">
               <BsChatSquare />
             </div>
             <h2 className="welcome-title">
@@ -163,8 +117,8 @@ const ChatPage = () => {
                 <ChatContainer currentChat={currentChat} socket={socket} />
               )}
               
-              {/* Welcome to TriSec{user ? `, ${userName}` : ''}! */}
-            </h2>
+              Welcome to TriSec{user ? `, ${userName}` : ''}!
+            </h2> */}
           </div>
         </section>
       </main>

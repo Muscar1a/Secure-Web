@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import auth, users, message
 from core.config import settings
-from db.mongo import get_db, startup_db_client, shutdown_db_client
+from db.mongo import db_connection_status, get_db, startup_db_client, shutdown_db_client
 
 import socketio
 import logging
@@ -12,9 +12,18 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-#   DATABASE LIFECYCLE  
-app.add_event_handler("startup", startup_db_client)
-app.add_event_handler("shutdown", shutdown_db_client)
+# Register the startup event handler
+@app.on_event('startup')
+async def startup_event():
+    await startup_db_client(app)
+    await db_connection_status()
+
+
+# Register the shutdown event handler
+@app.on_event('shutdown')
+async def shutdown_event():
+    await shutdown_db_client(app)
+    
 
 #   SOCKET.IO
 sio = socketio.AsyncServer(
@@ -37,21 +46,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#   API ROUTERS
-app.include_router(auth.router,   prefix="/auth",    tags=["auth"])
-app.include_router(users.router,  prefix="/users",   tags=["users"])
-app.include_router(message.router,prefix="/messages",tags=["messages"])
 
-#   HEALTHCHECK
-@app.get("/health/db")
-async def health_check_db(db=Depends(get_db)):
-    """
-    Ping MongoDB via the dependency and report status.
-    """
-    try:
-        # note: db.client is the same as _client under the hood
-        await db.client.admin.command("ping")
-        return {"status": "ok"}
-    except Exception as e:
-        logger.error("DB healthcheck failed", exc_info=e)
-        return {"status": "error", "detail": str(e)}
+
+#   API ROUTERS
+app.include_router(auth.router)
+app.include_router(users.router)
+

@@ -4,6 +4,7 @@ from schemas.user import UserCreate
 from core.security import get_password_hash
 from beanie import PydanticObjectId
 from models.user import User
+import schemas
 
 async def get_user(db, username: str) -> Optional[dict]:
     """
@@ -17,7 +18,8 @@ async def get_user_by_email(email: str) -> Optional[User]:
     """
     return await User.find_one(User.email == email)
 
-async def create_user(user_in: UserCreate) -> User:
+
+async def create_user(user_in: schemas.UserCreate) -> schemas.User:
     """
     Create a new User document, hashing the password,
     and return the inserted User instance.

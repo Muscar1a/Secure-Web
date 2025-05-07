@@ -6,7 +6,8 @@ class UserBase(BaseModel):
     email: str
 
 class UserCreate(UserBase):
-    password: str
+    password1: str
+    password2: str
 
 
     @field_validator("password")
