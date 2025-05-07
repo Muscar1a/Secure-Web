@@ -1,14 +1,12 @@
-from beanie import Document, Indexed
-from pydantic import EmailStr, Field
-from typing import Optional
-from bson import ObjectId
+from datetime import datetime
+from pydantic import BaseModel, Field, EmailStr
 from schemas.chat import MessageRecipient
-from core.utils import (
-    get_uuid4,
-    datetime_now,
+from core.utils import(
+    datetime_now, 
+    get_uuid4
 )
 
-class UserModel(Document):
+class UserModel(BaseModel):
     id: str = Field(default_factory=get_uuid4)
     first_name: str | None = Field(None, max_length=100)
     last_name: str | None = Field(None, max_length=100)

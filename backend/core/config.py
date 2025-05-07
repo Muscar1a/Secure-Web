@@ -19,19 +19,19 @@ class GlobalSettings(BaseSettings):
     # MongoDB
     MONGODB_URL: str = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
     MONGODB_DB_NAME: str = "chatapp"
-    
+    USERS_COLLECTION: str = "users"
     # Authentication
-    SECRET_KEY: str
-    ALGORITHM: str 
+    SECRET_KEY: str = "IT-E15"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     PASSWORD_RESET_EXPIRE_MINUTES: int = 60
 
     # SMTP
-    SMTP_HOST: str
-    SMTP_PORT: int
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
     SMTP_USER: str
     SMTP_PASSWORD: str
-    EMAIL_FROM: str
+    EMAIL_FROM: str = "ChatApp Support"
 
     # Password-reset URL
     FRONTEND_URL: str 

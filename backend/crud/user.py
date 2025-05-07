@@ -15,7 +15,7 @@ from core.config import settings
 class BaseUserManager:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
-        self.user_collection = self.db[settings.USERS_COLLECTION]
+        self.user_collection = self.db['users']
 
     async def get_by_id(self, id: str) -> UserInDb:
         user = await self.user_collection.find_one({'id': id})
@@ -26,6 +26,10 @@ class BaseUserManager:
 
     async def get_by_email(self, email: str) -> UserInDb:
         return await self.user_collection.find_one({'email': email})
+
+    async def get_by_username(self, username: str) -> UserInDb:
+        return await self.user_collection.find_one({'username': username})
+    
 
     async def get_all(self) -> list[User]:
         users = await self.user_collection.find({}).to_list(length=None)
@@ -52,7 +56,7 @@ class BaseUserManager:
 
 class UserDBManager(BaseUserManager):
     async def authenticate(self, user_data: Login) -> UserInDb:
-        user = await self.get_by_email(user_data.email)
+        user = await self.get_by_username(user_data.username)
         # print('user', user)
         if not user or not verify_password(user_data.password, user.get('password')):
             return None
@@ -66,7 +70,7 @@ class UserCreator(BaseUserManager):
         if existing_user:
             raise UserCreationError('Email', 'Email already in use!')
 
-        password_hash = get_password_hash(user_data.password1)
+        password_hash = get_password_hash(user_data.password)
         updated_user_data = {
             **user_data.model_dump(),
             'password': password_hash
@@ -108,6 +112,7 @@ class UserDeleter(BaseUserManager):
 
         user.pop('_id', None)
         return user
+
 
 class User(UserDBManager, UserCreator, UserUpdater, UserDeleter):
     pass

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 class Token(BaseModel):
@@ -7,3 +7,14 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+class Login(BaseModel):
+    email: EmailStr
+    username: str
+    password: str
+    
+
+
+class TokenPayload(BaseModel):
+    sub: str | None = None

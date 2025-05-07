@@ -1,11 +1,15 @@
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 from jose import JWTError
 
+from api.deps import get_token_manager, get_user_manager
+from services.token import TokenManager
 from schemas.token import Token
-from crud.auth import authenticate_user
+import schemas
+from crud.user import User
 from core.security import (
     create_access_token,
     create_password_reset_token,
@@ -15,25 +19,31 @@ from core.security import (
 )
 
 from core.email import send_reset_email
-from backend.crud.user import get_user_by_email, update_user_password
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
 
-@router.post("/token", response_model=Token)
+@router.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-):
-    user = await authenticate_user(form_data.username, form_data.password)
+    user_manager: User = Depends(get_user_manager),
+    token_manager: TokenManager = Depends(get_token_manager),
+) -> Any:
+    user = await user_manager.authenticate(form_data)
     if not user:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            # headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token({"sub": user.username})
+    # access_token = create_access_token({"sub": user.username})
+    subject = user.get('id')
+    """
+        Here we use id for further access token generation.
+    """
+    access_token = await token_manager.get_jwt_access_token(subject)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -93,39 +103,3 @@ async def reset_password(req: ResetPasswordRequest):
     await update_user_password(str(user["_id"]), hashed)
     return {"msg": "Password has been reset successfully."}
 
-
-@router.get("/allusers/{user_id}", response_model=dict)
-async def get_all_users(user_id: str):
-    """
-    Retrieve all users except the current user.
-    """
-    try:
-        # Validate ObjectId
-        if not ObjectId.is_valid(user_id):
-            raise HTTPException(status_code=400, detail="Invalid user ID")
-
-        # Fetch all users except the current user
-        users = await db.users.find({"_id": {"$ne": ObjectId(user_id)}}).to_list()
-        
-        # Serialize users to match Pydantic model
-        serialized_users = [
-            {
-                "_id": str(user["_id"]),
-                "username": user["username"],
-                "email": user["email"],
-                "is_active": user["is_active"]
-            }
-            for user in users
-        ]
-        
-        return {"users": serialized_users}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
-
-
-@router.get("/logout")
-async def logout():
-    """
-    Logs out the user by invalidating the token (client-side action).
-    """
-    return {"msg": "Logged out successfully. Please delete the token from your client."}

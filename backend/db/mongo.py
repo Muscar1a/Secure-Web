@@ -1,11 +1,8 @@
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+
 import logging
-import os
 
 from core.config import settings
-from models.user import User 
-from models.message import Message
 
 logger = logging.getLogger(__name__)
 

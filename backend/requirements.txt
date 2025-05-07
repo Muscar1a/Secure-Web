@@ -10,3 +10,4 @@ pydantic[email]
 beanie>=1.26.1
 python-socketio>=5.9.0
 pymongo
+itsdangerous

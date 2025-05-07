@@ -35,18 +35,6 @@ const ChatPage = () => {
   }, []);
 
 
-
-  useEffect(() => {
-    const fetchContacts = async () => {
-      if (currentUser) {
-        const response = await axios.get(`${allUsersRoute}/${currentUser.id}`);
-        // console.log('API response:', response.data);
-        setContacts(response.data.users);
-      }
-    };
-    fetchContacts();
-  }, [currentUser]);
-
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
   };
