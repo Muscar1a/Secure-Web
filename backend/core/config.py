@@ -24,6 +24,7 @@ class GlobalSettings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 60
 
     # SMTP
     SMTP_HOST: str
