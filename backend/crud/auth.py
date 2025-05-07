@@ -1,13 +1,19 @@
 from core.security import verify_password
 from crud.users import get_user
+from models.user import User
 from typing import Optional
 
-async def authenticate_user(db, username: str, password: str) -> Optional[dict]:
+async def authenticate_user(
+    username: str,
+    password: str,
+) -> Optional[User]:
     """
-    Verify a user's credentials using MongoDB.
-    Returns the user document if valid, otherwise None.
+    Verify username & password.
+    Returns the User if credentials match, otherwise None.
     """
-    user = await get_user(db, username)
-    if not user or not verify_password(password, user["hashed_password"]):
+    user = await get_user(username)
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
         return None
     return user

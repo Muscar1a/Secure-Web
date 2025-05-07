@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
 from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from api.deps import get_db
+from db.mongo import get_db
 
 from models.message import (
     MessageModel,
