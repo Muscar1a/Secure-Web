@@ -41,15 +41,18 @@ async def login_for_access_token(
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Incorrect username or password",
-            # headers={"WWW-Authenticate": "Bearer"},
         )
-    # access_token = create_access_token({"sub": user.username})
     subject = user.get('id')
     """
         Here we use id for further access token generation.
     """
     access_token = await token_manager.get_jwt_access_token(subject)
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = await token_manager.get_jwt_refresh_token(subject)
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
 
 
 class PasswordResetRequest(BaseModel):
