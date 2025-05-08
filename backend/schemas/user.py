@@ -25,7 +25,9 @@ class UserCreate(UserBase):
         # at least one uppercase letter
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must include at least one uppercase letter")
-        
+        # at least one digit
+        if not re.search(r"\d", v):
+            raise ValueError("Password must include at least one digit")
         return v
     
     

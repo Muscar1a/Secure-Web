@@ -64,6 +64,8 @@ class ResetPasswordRequest(BaseModel):
             raise ValueError("Password must include at least one uppercase letter")
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
             raise ValueError("Password must include at least one special character")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must include at least one digit")
         return v
     
 # request reset
