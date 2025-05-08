@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from api.routers import auth, users, message
 from core.config import settings
@@ -16,6 +17,11 @@ app = FastAPI()
 @app.on_event('startup')
 async def startup_event():
     await startup_db_client(app)
+    db: AsyncIOMotorDatabase = app.mongodb
+    await db["password_reset_tokens"].create_index(
+        "expires_at",
+        expireAfterSeconds=0
+    )
     await db_connection_status()
 
 
