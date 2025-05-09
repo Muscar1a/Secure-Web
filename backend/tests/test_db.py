@@ -1,5 +1,4 @@
 import os
-import pytest
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("MONGODB_URI", "mongodb://localhost:27017/test_db")

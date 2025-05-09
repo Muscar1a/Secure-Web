@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIWebSocketRoute
 
-from api.routers import auth, users, message
+from api.routers import auth, users, chat
+from websocket.wsocket import chat_websocket_endpoint
 from core.config import settings
-from db.mongo import db_connection_status, get_db, startup_db_client, shutdown_db_client
+from db.mongo import db_connection_status, startup_db_client, shutdown_db_client
 
 import socketio
 import logging
@@ -46,9 +48,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 #   API ROUTERS
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(chat.router)
 
+
+
+#   WebSocket
+websocket = APIWebSocketRoute("/ws/chat/{chat_tpye}/{chat_id}/token={token}", chat_websocket_endpoint)
+app.router.routes.append(websocket)

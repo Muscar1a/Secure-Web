@@ -13,19 +13,13 @@ class MessageCreate(MessageBase):
 class Message(MessageBase):
     id: str
     created_by: str
-    # created_at=datetime(2023, 10, 4, 21, 5, 52, 637000)
     created_at: datetime
   
 
 class MessageResponse(Message):
-    created_at: str          # Define the field as a string
- 
-
-# class MessageResponse(Message):
-#     class Config:
-#         exclude = ["created_at"]
-
-
+    created_at: str
+    
+    
 class ChatId(BaseModel):
     chat_id: str
 
@@ -55,3 +49,4 @@ class GroupChat(ChatBase):
 
 class GroupChatResponse(GroupChat):
     pass
+

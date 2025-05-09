@@ -1,7 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import auth, users, message
+from api.routers import auth, users
 from motor.motor_asyncio import AsyncIOMotorClient
+from backend.api.routers import chat
 from core.config import settings
 from fastapi_socketio import SocketManager
 
@@ -23,7 +24,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
-app.include_router(message.router, prefix="/messages", tags=["Messages"])
+app.include_router(chat.router, prefix="/messages", tags=["Messages"])
 
 
 @app.on_event("startup")
@@ -57,7 +58,7 @@ async def send_msg(sid, data):
 
 @socket_manager.on("tag-msg")
 async def react_msg(sid, data):
-    await message.tag_message(message_id=data["message_id"], tag=data["tag"])
+    await chat.tag_message(message_id=data["message_id"], tag=data["tag"])
     send_user_sockets = online_users.get(data["sender"], None)
     if send_user_sockets:
         for user_socket in send_user_sockets:

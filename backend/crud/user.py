@@ -66,7 +66,7 @@ class UserDBManager(BaseUserManager):
 class UserCreator(BaseUserManager):
     async def create_user(self, user_data: UserCreate) -> UserInDb:
         """Create a new user with hashed password."""
-        existing_user = await self.get_by_email(user_data.email)
+        existing_user = await self.get_by_username(user_data.username)
         if existing_user:
             raise UserCreationError('Email', 'Email already in use!')
 

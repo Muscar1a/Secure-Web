@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
+from crud.chat import PrivateChatManager
 from services.token import TokenManager
 from crud.user import User
 from db.mongo import get_db
@@ -53,3 +54,10 @@ async def get_current_active_user(
     if not current_user['is_active']:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+async def get_private_chat_manager(
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user_manager: User = Depends(get_user_manager)    # here User is a class
+):
+    return PrivateChatManager(db, user_manager)
