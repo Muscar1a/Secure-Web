@@ -1,9 +1,10 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 from jose import JWTError
+from datetime import datetime
 
 from api.deps import get_token_manager, get_user_manager
 from services.token import TokenManager
@@ -11,22 +12,27 @@ from schemas.token import Token
 import schemas
 from crud.user import User
 from core.security import (
-    create_access_token,
     create_password_reset_token,
-    verify_password_reset_token,
     verify_password,
     get_password_hash,
 )
-
+from .auth_utils import create_password_reset_token
 from core.email import send_reset_email
+from schemas import UserUpdate
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
 
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+limiter = Limiter(key_func=get_remote_address)
+
 @router.post("/token", response_model=schemas.Token)
+@limiter.limit("5/minute")  
 async def login_for_access_token(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_manager: User = Depends(get_user_manager),
     token_manager: TokenManager = Depends(get_token_manager),
@@ -36,15 +42,18 @@ async def login_for_access_token(
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Incorrect username or password",
-            # headers={"WWW-Authenticate": "Bearer"},
         )
-    # access_token = create_access_token({"sub": user.username})
     subject = user.get('id')
     """
         Here we use id for further access token generation.
     """
     access_token = await token_manager.get_jwt_access_token(subject)
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = await token_manager.get_jwt_refresh_token(subject)
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
 
 
 class PasswordResetRequest(BaseModel):
@@ -64,30 +73,44 @@ class ResetPasswordRequest(BaseModel):
             raise ValueError("Password must include at least one uppercase letter")
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
             raise ValueError("Password must include at least one special character")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must include at least one digit")
         return v
     
 # request reset
 @router.post("/request-password-reset")
-async def request_password_reset(req: PasswordResetRequest):
-    user = await get_user_by_email(req.email)
+@limiter.limit("5/minute") 
+async def request_password_reset(
+    request: Request,
+    req: PasswordResetRequest,
+    user_manager: User = Depends(get_user_manager),
+):
+    user = await user_manager.get_by_email(req.email)
     # Always 200 to avoid email enumeration
     if user:
-        token = create_password_reset_token(user["email"])
+        token = await create_password_reset_token(user_manager.db, user)
         await send_reset_email(user["email"], token)
     return {"msg": "If that email is registered, you’ll receive reset instructions."}
 
 # reset password
-from core.security import verify_password
 @router.post("/reset-password")
-async def reset_password(req: ResetPasswordRequest):
+@limiter.limit("5/minute") 
+async def reset_password(
+    request: Request,
+    req: ResetPasswordRequest,
+    user_manager: User = Depends(get_user_manager),
+):
     # validate & decode token
-    try:
-        email = verify_password_reset_token(req.token)
-    except JWTError:
+    token_doc = await user_manager.db["password_reset_tokens"].find_one({"token": req.token})
+    if (
+        not token_doc
+        or token_doc["used"]
+        or token_doc["expires_at"] < datetime.utcnow()
+    ):
         raise HTTPException(400, "Invalid or expired token")
 
     # fetch user
-    user = await get_user_by_email(email)
+    user = await user_manager.get_by_id(token_doc["user_id"])
     if not user:
         raise HTTPException(404, "User not found")
 
@@ -98,8 +121,15 @@ async def reset_password(req: ResetPasswordRequest):
             detail="New password must be different from your current password"
         )
 
-    # now safe to hash & update
+    # hash & update
     hashed = get_password_hash(req.new_password)
-    await update_user_password(str(user["_id"]), hashed)
-    return {"msg": "Password has been reset successfully."}
+    updated = UserUpdate(id=user["id"], password=hashed)
+    await user_manager.update_user(updated)
 
+    # mark token as used
+    await user_manager.db["password_reset_tokens"].update_one(
+        {"_id": token_doc["_id"]},
+        {"$set": {"used": True}}
+    )
+
+    return {"msg": "Password has been reset successfully."}

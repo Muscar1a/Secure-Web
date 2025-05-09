@@ -39,7 +39,6 @@ async def register(
             }
         )
 
-
         
         
 @router.get("/me", response_model=schemas.User)
