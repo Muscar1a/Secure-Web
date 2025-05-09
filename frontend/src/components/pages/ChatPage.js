@@ -10,7 +10,7 @@ import { CgProfile } from 'react-icons/cg';
 import { BiLogOut } from 'react-icons/bi';
 
 const ChatPage = () => {
-  const { user, logout, loading } = useContext(AuthContext);
+  const { user, token, logout, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [contacts, setContacts] = useState([]);
@@ -22,6 +22,77 @@ const ChatPage = () => {
 
   const socketRef = useRef(null);
 
+  // Load contacts
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await axios.get(`${host}/users/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setContacts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch contacts", error);
+      }
+    };
+
+    if (token) {
+      fetchContacts();
+    }
+  }, [token]);
+
+
+  // Connect to WebSocket when currentChatId changes
+  useEffect(() => {
+    if (!currentChatId) return;
+
+    const token = encodeURIComponent(localStorage.getItem('token'));
+    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}/token=${token}`);
+    socketRef.current = socket;
+    // TODO: currently websocket is reject, we need to fix it
+    socket.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    };
+    return () => {
+      socket.close();
+    };
+  }, [currentChatId]);
+
+  // Handle message input change
+  const handleInputChange = (e) => {
+    setMessageInput(e.target.value);
+  }
+
+  // Send to websocket
+  const handleSendMessage = async (e) => {
+    if (messageInput.trim() === '') return;
+
+    const message = {
+      sender: user.id,
+      recipient: selectedRecipient.id,
+      content: messageInput,
+    }
+
+    socketRef.current.send(JSON.stringify(message));
+    setMessageInput('');
+  }
+
+  const renderContactList = () => {
+    return contacts.map((contact) => (
+      <li
+        key={contact.id}
+        className={`contact-item ${currentChatId === contact.id ? 'active' : ''}`}
+        onClick={() => {
+          setSelectedRecipient(contact);
+          setCurrentChatId(contact.id);
+        }}
+      >
+        {contact.first_name || ''} {contact.last_name || ''} (@{contact.username})
+      </li>
+    ));
+  };
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;
@@ -51,6 +122,9 @@ const ChatPage = () => {
         </nav>
       </header>
 
+      <div className="welcome-message">
+        Welcome to TriSec{user ? `, ${userName}` : ''}!
+      </div>
 
       <main className="chat-main">
         <aside className="chat-sidebar">
@@ -58,30 +132,36 @@ const ChatPage = () => {
             <BsPeople className="sidebar-icon" />
             Contacts
           </div>
-          <div className="sidebar-filter">
+          {/* <div className="sidebar-filter">
             <input type="checkbox" id="show-online" />
-            {/* <label htmlFor="show-online">Show online only</label> */}
-          </div>
+            <label htmlFor="show-online">Show online only</label>
+          </div> */}
           <ul className="contact-list">
-            {/* {renderContactList()} */}
-            
+            {renderContactList()}
+
           </ul>
         </aside>
 
         <section className="chat-area">
-          <div className="welcome-message">
-            {/* <div className="welcome-icon">
-              <BsChatSquare />
+          <div className="chat-window">
+            <div className="chat-messages">
+              {messages.map((msg, index) => (
+                <div key={index} className={`message ${msg.sender === user.id ? "sent" : "received"}`}>
+                  <p>{msg.content}</p>
+                </div>
+              ))}
             </div>
-            <h2 className="welcome-title">
-              {currentChat === undefined ? (
-                <Welcome />
-              ) : (
-                <ChatContainer currentChat={currentChat} socket={socket} />
-              )}
-              
-              Welcome to TriSec{user ? `, ${userName}` : ''}!
-            </h2> */}
+
+            <div className="message-input">
+              <input
+                type="text"
+                value={messageInput}
+                onChange={handleInputChange}
+                placeholder="Type a message..."
+              />
+              <button onClick={handleSendMessage}>Send</button>
+            </div>
+            
           </div>
         </section>
       </main>
