@@ -22,67 +22,6 @@ const ChatPage = () => {
 
   const socketRef = useRef(null);
 
-  const connectWebSocket = (chatId) => {
-    const token = localStorage.getItem('access_token');
-    const ws = new WebSocket(`${ws_host}/ws/chat/private/${chatId}/token=${token}`);
-    socketRef.current = ws;
-
-    ws.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages(prev => [...prev, newMessage]);
-    };
-    // TODO: cần check xem đã được connect tới websocket chưa
-    ws.onopen = () => console.log("[WebSocket] Connected");
-    ws.onclose = () => console.log("[WebSocket] Disconnected");
-  };
-
-
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const res = await axios.get(`${host}/chat/private/msg-recipients/`);
-        // TODO: check https://chatgpt.com/c/681c397b-7828-800b-bd54-64a1073237bb
-        setContacts(res.data);
-      } catch (err) {
-        console.error('Error fetching contacts:', err);
-      }
-    };
-    fetchContacts();
-  }, []);
-
-
-  const handleSelectContact = async (recipient) => {
-    try {
-      setSelectedRecipient(recipient);
-
-      // Create/get chat
-      const res = await axios.get(`${host}/chat/private/recipient/create-chat/${recipient._id}`);
-      const chatId = res.data.chat_id;
-      setCurrentChatId(chatId);
-
-      // Get messages
-      const msgRes = await axios.get(`${host}/chat/private/messages/${chatId}`);
-      setMessages(msgRes.data);
-
-      // Close existing socket
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
-
-      // Connect to new socket
-      connectWebSocket(chatId);
-    } catch (err) {
-      console.error('Error loading chat:', err);
-    }
-  };
-
-  const sendMessage = () => {
-    if (socketRef.current && messageInput.trim() !== "") {
-      socketRef.current.send(messageInput);
-      setMessageInput("");
-    }
-  };
-
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;
@@ -125,14 +64,7 @@ const ChatPage = () => {
           </div>
           <ul className="contact-list">
             {/* {renderContactList()} */}
-            {contacts.map((contact) => (
-              <li key={contact._id} 
-                onClick={() => handleSelectContact(contact)}
-                className={selectedRecipient?._id === contact._id ? 'active' : ''}
-              >
-                {contact.username || contact.name}
-              </li>
-            ))}
+            
           </ul>
         </aside>
 
