@@ -13,12 +13,31 @@ class TokenManager:
         self.user_manager = user_manager
         self.jwt_secret_key = settings.SECRET_KEY
         self.jwt_algorithm = settings.ALGORITHM
-        self.expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-
+        # short-lived access tokens
+        self.access_expires  = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        # longer-lived refresh tokens
+        self.refresh_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     async def get_jwt_access_token(self, subject: str) -> str:
-        expire = datetime.utcnow() + self.expires_delta
-        payload = {"exp": expire, "sub": subject}
+        now = datetime.utcnow()
+        expire = now + self.access_expires
+        payload = {
+            "exp": expire, 
+            "sub": subject,
+            "iat": now,
+            "type": "access",
+        }
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)
+
+    async def get_jwt_refresh_token(self, subject: str) -> str:
+        now = datetime.utcnow()
+        expire = now + self.refresh_expires
+        payload = {
+            "exp": expire,
+            "sub": subject,
+            "iat": now,
+            "type": "refresh",
+        }
+        return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)   
 
     async def get_data_form_jwt_token(self, token) -> schemas.TokenPayload:
         try:
@@ -27,6 +46,9 @@ class TokenManager:
                 self.jwt_secret_key,
                 algorithms=[self.jwt_algorithm]
             )
+            tokentype = payload.get("type")
+            if tokentype not in ("access", "refresh"):
+                raise credentials_exception
             subject: str = payload.get("sub")
             if subject is None:
                 raise credentials_exception

@@ -5,7 +5,11 @@ from core.config import settings
 from typing import Any, Dict, Optional
 # SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["bcrypt"], 
+    deprecated="auto", 
+    bcrypt__rounds=14
+)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
