@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr, field_validator
 import re
@@ -32,6 +32,7 @@ limiter = Limiter(key_func=get_remote_address)
 @router.post("/token", response_model=schemas.Token)
 @limiter.limit("5/minute")  
 async def login_for_access_token(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_manager: User = Depends(get_user_manager),
     token_manager: TokenManager = Depends(get_token_manager),
@@ -80,6 +81,7 @@ class ResetPasswordRequest(BaseModel):
 @router.post("/request-password-reset")
 @limiter.limit("5/minute") 
 async def request_password_reset(
+    request: Request,
     req: PasswordResetRequest,
     user_manager: User = Depends(get_user_manager),
 ):
@@ -94,6 +96,7 @@ async def request_password_reset(
 @router.post("/reset-password")
 @limiter.limit("5/minute") 
 async def reset_password(
+    request: Request,
     req: ResetPasswordRequest,
     user_manager: User = Depends(get_user_manager),
 ):
