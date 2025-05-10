@@ -20,18 +20,16 @@ async def chat_websocket_endpoint(
     await websocket.accept()
     print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
     
-    current_user = await token_manager.get_user_form_jwt_token(token, token_subject_key)
-    print(f"[User] username={current_user['username']} | id={current_user['id']}")
-
     try:
-        if chat_id in connected_clients:
-            connected_clients[chat_id].add(websocket)
-        else:
-            connected_clients[chat_id] = {websocket}
-        print(f"[Connected Clients] {connected_clients}")
-    except KeyError:
-        print(f"[+] Error adding client websocket: {websocket} to the Chat id: {chat_id}")
+        current_user = await token_manager.get_user_form_jwt_token(token, token_subject_key)
+        print(f"[User] username={current_user['username']} | id={current_user['id']}")
+    except Exception as e:
+        await websocket.send_json({"error": "Invalid token"})
+        await websocket.close()
         return
+    
+    connected_clients.setdefault(chat_id, set()).add(websocket)
+    print(f"[Connected Clients] {connected_clients}")
     
     try:
         while True:

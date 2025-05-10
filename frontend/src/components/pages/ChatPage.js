@@ -19,6 +19,7 @@ const ChatPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [messageInput, setMessageInput] = useState("");
 
+  console.log('ChatPage user:', user);
 
   const socketRef = useRef(null);
 
@@ -45,12 +46,14 @@ const ChatPage = () => {
 
   // Connect to WebSocket when currentChatId changes
   useEffect(() => {
-    if (!currentChatId) return;
+    if (!currentChatId || !selectedRecipient) return;
+
 
     const token = encodeURIComponent(localStorage.getItem('token'));
-    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}/token=${token}`);
+    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${token}`);
+    console.log('Connecting to WebSocket:', socket);
+
     socketRef.current = socket;
-    // TODO: currently websocket is reject, we need to fix it
     socket.onmessage = (event) => {
       const newMessage = JSON.parse(event.data);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -58,46 +61,68 @@ const ChatPage = () => {
     return () => {
       socket.close();
     };
-  }, [currentChatId]);
+  }, [currentChatId, selectedRecipient]);
 
   // Handle message input change
   const handleInputChange = (e) => {
     setMessageInput(e.target.value);
-  }
+  };
 
   // Send to websocket
-  const handleSendMessage = async (e) => {
-    if (messageInput.trim() === '') return;
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (messageInput.trim() === '' || !socketRef.current || !selectedRecipient) return;
 
     const message = {
       sender: user.id,
       recipient: selectedRecipient.id,
       content: messageInput,
-    }
+    };
 
     socketRef.current.send(JSON.stringify(message));
     setMessageInput('');
-  }
-
-  const renderContactList = () => {
-    return contacts.map((contact) => (
-      <li
-        key={contact.id}
-        className={`contact-item ${currentChatId === contact.id ? 'active' : ''}`}
-        onClick={() => {
-          setSelectedRecipient(contact);
-          setCurrentChatId(contact.id);
-        }}
-      >
-        {contact.first_name || ''} {contact.last_name || ''} (@{contact.username})
-      </li>
-    ));
   };
+
+
+  const getPrivateConversationId = (userId, contactId) => {
+    const ids = [userId, contactId].sort();
+    return `${ids[0]}_${ids[1]}`;
+  };
+
+  // Render contact list
+  const renderContactList = () => {
+    if (!Array.isArray(contacts)) {
+      return <p>Loading contacts...</p>;
+    }
+
+
+    return contacts.map((contact, idx) => {
+      console.log(`contact[${idx}]`, contact);
+      console.log(`user.dd`, user.id, `contact.id`, contact.id);
+
+      const conversationId = getPrivateConversationId(user.id, contact.id);
+      const isActive = currentChatId === conversationId;
+      return (
+        <li
+          key={conversationId}
+          className={`contact-item ${isActive ? 'active' : ''}`}
+          onClick={() => {
+            setSelectedRecipient(contact);
+            setCurrentChatId(conversationId);
+          }}
+        >
+          {contact.first_name || ''} {contact.last_name || ''} (@{contact.username})
+        </li>
+      );
+    });
+  };
+
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;
   }
-
+  
   const userName = user?.username || user?.name || 'User';
 
 
@@ -158,10 +183,13 @@ const ChatPage = () => {
                 value={messageInput}
                 onChange={handleInputChange}
                 placeholder="Type a message..."
+                disabled={!selectedRecipient}
               />
-              <button onClick={handleSendMessage}>Send</button>
+              <button onClick={handleSendMessage} disabled={!selectedRecipient || !messageInput.trim()}>
+                Send
+              </button>
             </div>
-            
+
           </div>
         </section>
       </main>

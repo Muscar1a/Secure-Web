@@ -18,6 +18,9 @@ from serializers import serializers
 #         return True
 #     return False
 
+class ChatNotFoundException(Exception):
+    pass
+
 
 class BaseChatManager:
     def __init__(self, db: AsyncIOMotorDatabase, chat_collection: str , user_manager: User):
@@ -28,8 +31,8 @@ class BaseChatManager:
     async def get_chat_by_id(self, chat_id: str) -> dict:
         chat = await self.chat_collection.find_one({'chat_id': chat_id})
         if not chat:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f'Chat not found')
+            # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Chat not found')
+            raise ChatNotFoundException(f'Chat with id {chat_id} not found')
         return chat
 
     async def get_chat_messages(self, chat_id: str) -> list[schemas.Message]:
