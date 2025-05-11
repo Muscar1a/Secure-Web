@@ -67,8 +67,11 @@ class BaseChatManager:
                 detail='Message was not sent!'
             )
 
-        new_message = MessageModel(created_by=current_user_id, message=message)
-        print('new_message', new_message)
+        new_message = MessageModel(created_by=current_user_id, message=message[1:-1])
+        print('\n - new_message full', new_message.model_dump())
+        print('\n - new_message message only', new_message.model_dump()['message'])
+        print('\n - new_message type', type(new_message.model_dump()['message']))
+        
 
         result = await self.chat_collection.update_one(
             {'chat_id': chat_id},
@@ -177,7 +180,7 @@ class PrivateChatManager(BaseChatManager):
         # user = await self.chat_collection.find_one(query)
 
         user = await self.user_manager.get_by_id(current_user_id)
-
+        print('-------------user: ', user)
         # print('user[\'private_message_recipients\']: ', user['private_message_recipients'] )
         if user['private_message_recipients']:
             for recipient in user['private_message_recipients']:

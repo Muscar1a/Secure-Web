@@ -18,11 +18,11 @@ async def chat_websocket_endpoint(
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
 ):
     await websocket.accept()
-    # print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
+    print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
     
     try:
         current_user = await token_manager.get_user_form_jwt_token(token, token_subject_key)
-        # print(f"[User] username={current_user['username']} | id={current_user['id']}")
+        print(f"[User] username={current_user['username']} | id={current_user['id']}")
     except Exception as e:
         await websocket.send_json({"error": "Invalid token"})
         await websocket.close()
@@ -55,5 +55,5 @@ async def chat_websocket_endpoint(
         
         if not connected_clients[chat_id]:
             del connected_clients[chat_id]
-        #     print(f"[+] No more clients connected to chat ID: {chat_id}. Removed from connected_clients.")
-        # print("Finally remaining clints:", connected_clients)
+            print(f"[+] No more clients connected to chat ID: {chat_id}. Removed from connected_clients.")
+        print("Finally remaining clints:", connected_clients)

@@ -23,6 +23,14 @@ const ChatPage = () => {
 
   const socketRef = useRef(null);
 
+  //* Scroll to bottom of chat window
+  // ################################################## //
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   //* reload to assure user is logged in
   // ################################################## //
   useEffect(() => {
@@ -62,16 +70,17 @@ const ChatPage = () => {
     console.log("--> fetchOrCreateChat called with recipientId:", recipientId);
     try {
       // Get API for chat_id
+      console.log(`${host}/chat/private/recipient/chat-id/${recipientId}`);
       const response = await axios.get(`${host}/chat/private/recipient/chat-id/${recipientId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Recipients fetched:", response.data);
-      // return response.data.chat_id;
-      setCurrentChatId(response.data.chat_id);
+      return response.data.chat_id;
+      // setCurrentChatId(response.data.chat_id);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      console.log("Error fetching chat ID:", error);
+      if (error.response.status === 404) {
         // Not found, create a new chat
         const createResponse = await axios.get(`${host}/chat/private/recipient/create-chat/${recipientId}`, {
           headers: {
@@ -79,51 +88,64 @@ const ChatPage = () => {
           },
         });
         console.log("Chat created:", createResponse.data);
+        // setCurrentChatId(createResponse.data.chat_id);
         return createResponse.data.chat_id;
       } else {
         console.error("Error fetching/creating chat:", error);
         return null;
       }
     }
+
   }
 
   // ################################################## //
   //* Connect to WebSocket when currentChatId changes
   // ################################################## //
 
+
   useEffect(() => {
-    const connectWebsocketAndFetchMessages = async () => {
-      if (!currentChatId || !selectedRecipient) return;
 
-      console.log("Current chat ID:", currentChatId);
+    if (!currentChatId || !selectedRecipient) return;
 
-      const token = encodeURIComponent(localStorage.getItem('token'));
-      const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${token}`);
-      socketRef.current = socket;
-      console.log('Connect to WebSocket:', socketRef.current, 'successfully!');
+    console.log("Current chat ID:", currentChatId);
 
-      
-      // Load old messages
+    const token = encodeURIComponent(localStorage.getItem('token'));
+    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${token}`);
+    socketRef.current = socket;
+    console.log('Connect to WebSocket:', socketRef.current, 'successfully!');
+
+
+    // Load old messages
+    const loadOldMessages = async () => {
       try {
+        console.log("Trying to load old messages...");
+
+        console.log("Fetching messages for chat ID:", currentChatId);
+
         const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("Old messages fetched:", response.data);
         setMessages(response.data);
       } catch (error) {
-        console.error("No messages found"); //, error);
+        console.error("No messages found", error);
       }
-
-      socket.onmessage = (event) => {
-        const newMessage = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      };
-      return () => {
-        socket.close();
-      };
-      
     };
-    connectWebsocketAndFetchMessages();
+
+    loadOldMessages();
+
+    socket.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    };
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+
   }, [currentChatId, selectedRecipient]);
+
 
   // Handle message input change
   const handleInputChange = (e) => {
@@ -135,18 +157,26 @@ const ChatPage = () => {
     e.preventDefault();
 
     if (messageInput.trim() === '' || !socketRef.current || !selectedRecipient) return;
+    /*
     const message = {
       sender: user.id,
       recipient: selectedRecipient.id,
       content: messageInput,
     };
+    */
+    const message = messageInput;   // TODO: apply double ratchet on this
     console.log("Sending message:", message);
 
     socketRef.current.send(JSON.stringify(message));
     setMessageInput('');
   };
+
+  useEffect(() => {
+    console.log("Messages updated:", messages);
+  }, [messages]);
+
+
   // ################################################## //
-  // TODO: need to see why the code does not load old messages, it seems that function is not called
   // Render contact list
   const renderContactList = () => {
     if (!Array.isArray(contacts)) {
@@ -163,10 +193,12 @@ const ChatPage = () => {
         <li
           key={contact.id}
           className={`contact-item ${isActive ? 'active' : ''}`}
-          onClick={() => {
+          onClick={async () => {
             setSelectedRecipient(contact);
-            const chatId = fetchOrCreateChat(contact.id);
-            setCurrentChatId(chatId);
+            const chatId = await fetchOrCreateChat(contact.id);
+            if (chatId) {
+              setCurrentChatId(chatId);
+            }
           }}
         >
           {contact.first_name || ''} {contact.last_name || ''} (@{contact.username})
@@ -223,14 +255,19 @@ const ChatPage = () => {
         <section className="chat-area">
           <div className="chat-window">
             <div className="chat-messages">
-              {messages.map((msg, index) => (
-                <div
-                  key={index} 
-                  className={`message ${msg.sender === user.id ? "sent" : "received"}`}
-                >
-                  <p>{msg.content}</p>
-                </div>
-              ))}
+              {messages.length > 0 ? (
+                messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`message ${msg.created_by === user.id ? "sent" : "received"}`}
+                  >
+                    <p>{msg.message}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="no-messages">No messages yet</p>
+              )}
+              <div ref={messagesEndRef} />
             </div>
 
             <div className="message-input">
