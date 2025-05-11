@@ -68,9 +68,9 @@ class BaseChatManager:
             )
 
         new_message = MessageModel(created_by=current_user_id, message=message[1:-1])
-        print('\n - new_message full', new_message.model_dump())
-        print('\n - new_message message only', new_message.model_dump()['message'])
-        print('\n - new_message type', type(new_message.model_dump()['message']))
+        # print('\n - new_message full', new_message.model_dump())
+        # print('\n - new_message message only', new_message.model_dump()['message'])
+        # print('\n - new_message type', type(new_message.model_dump()['message']))
         
 
         result = await self.chat_collection.update_one(
@@ -128,7 +128,7 @@ class PrivateChatManager(BaseChatManager):
         for user_id, recipient_id in message_recipients:
             recipient_model = MessageRecipientModel(
                 recipient_id=recipient_id, chat_id=new_chat.chat_id)
-            print('recipient_model', recipient_model)
+            # print('recipient_model', recipient_model)
 
             # add chat_id to member's private_message_recipients field
             insertd = await self.user_manager.insert_private_message_recipient(
@@ -180,7 +180,7 @@ class PrivateChatManager(BaseChatManager):
         # user = await self.chat_collection.find_one(query)
 
         user = await self.user_manager.get_by_id(current_user_id)
-        print('-------------user: ', user)
+        # print('-------------user: ', user)
         # print('user[\'private_message_recipients\']: ', user['private_message_recipients'] )
         if user['private_message_recipients']:
             for recipient in user['private_message_recipients']:

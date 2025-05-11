@@ -18,7 +18,7 @@ async def chat_websocket_endpoint(
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
 ):
     await websocket.accept()
-    print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
+    # print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
     
     try:
         current_user = await token_manager.get_user_form_jwt_token(token, token_subject_key)
@@ -39,7 +39,7 @@ async def chat_websocket_endpoint(
                 new_message = await pvt_chat_manager.create_message(current_user['id'], chat_id, message)
 
             serialized_message = message_serializer(new_message.model_dump())
-            print("[Response Message]", serialized_message)
+            # print("[Response Message]", serialized_message)
     
             for client_ws in connected_clients[chat_id]:
                 print(f"client_ws: {client_ws}")
