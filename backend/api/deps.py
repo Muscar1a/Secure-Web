@@ -1,66 +1,63 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.orm import Session
-#from db.session import SessionLocal
+
+from crud.chat import PrivateChatManager
+from services.token import TokenManager
+from crud.user import User
+from db.mongo import get_db
 from schemas.token import TokenData
-from crud.users import get_user
-from core.config import settings #SECRET_KEY, ALGORITHM
-from db.mongo import mongodb
+from core.config import settings
+from motor.motor_asyncio import AsyncIOMotorDatabase
+import schemas
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
-# async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-#     cred_exc = HTTPException(status_code=401, detail="Invalid credentials", headers={"WWW-Authenticate": "Bearer"})
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         username = payload.get("sub")
-#         if username is None:
-#             raise cred_exc
-#     except JWTError:
-#         raise cred_exc
-#     user = get_user(db, username)
-#     if user is None:
-#         raise cred_exc
-#     return user
-def get_db():
-    """
-    Provide a Motor (async Mongo) database handle.
-    """
-    return mongodb
+async def get_user_manager(db: AsyncIOMotorDatabase = Depends(get_db)):
+    return User(db)
 
+
+async def get_token_manager(
+    user_manager: User = Depends(get_user_manager)
+):
+    return TokenManager(user_manager)
+    
+    
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db = Depends(get_db),
-):
+    token_manager: TokenManager = Depends(get_token_manager),
+) -> schemas.User:
     """
-    Decode JWT, fetch the user from MongoDB, and return it.
+    Decode the JWT, fetch the User document via Beanie,
+    and return it (minus sensitive fields).
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-
-    user = await get_user(db, token_data.username)
+    
+    user = await token_manager.get_user_form_jwt_token(token, "id")
     if not user:
         raise credentials_exception
-    user["id"] = str(user["_id"])
-    user.pop("_id", None)
-    user.pop("hashed_password", None)
     return user
+
+# Dependency to create a User instance
+
+
+
+async def get_current_active_user(
+        current_user: schemas.User = Depends(get_current_user)
+) -> schemas.User:
+
+    if not current_user['is_active']:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+async def get_private_chat_manager(
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user_manager: User = Depends(get_user_manager)    # here User is a class
+):
+    return PrivateChatManager(db, user_manager)

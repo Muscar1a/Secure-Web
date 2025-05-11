@@ -9,28 +9,27 @@ import NavBar from './components/elements/Navbar';
 
 
 
-
 function App() {
   return (
     <div>
-    <AuthProvider>
-      <NavBar/>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route 
-            path="/chat" 
-            element={
-              <PrivateRoute>
-                <ChatPage />
-              </PrivateRoute>
-            } 
-          />
-          <Route path="/" element={<Navigate to="/login" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+      <AuthProvider>
+        <NavBar />
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/chat"
+              element={
+                <PrivateRoute>
+                  <ChatPage />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </div>
   );
 }

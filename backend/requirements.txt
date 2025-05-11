@@ -1,8 +1,13 @@
 fastapi
 uvicorn
-sqlalchemy
 pydantic
+pydantic_settings
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 motor
+pydantic[email]
+beanie>=1.26.1
+python-socketio>=5.9.0
+pymongo
+itsdangerous

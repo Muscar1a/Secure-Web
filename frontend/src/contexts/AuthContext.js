@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         //if token is invalid, clear localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        
+
         setAuthState({
           isAuthenticated: false,
           token: null,
@@ -57,21 +57,38 @@ export const AuthProvider = ({ children }) => {
     verifyToken();
   }, []);
 
+
+  const loginSuccess = (token, user) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+
+    setAuthState({
+      isAuthenticated: true,
+      token,
+      user,
+      loading: false,
+      checked: true,
+    });
+  };
+
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
+    sessionStorage.removeItem('chatPageReloaded'); // Xóa flag reload
+
     setAuthState({
       isAuthenticated: false,
       token: null,
       user: null,
-      loading: false
+      loading: false,
+      checked: true,
     });
   };
-
   return (
-    <AuthContext.Provider value={{ ...authState, setAuthState, logout }}>
+    <AuthContext.Provider value={{ ...authState, setAuthState, logout, loginSuccess }}>
       {children}
     </AuthContext.Provider>
   );
 };
+

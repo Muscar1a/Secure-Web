@@ -33,9 +33,6 @@ const LoginView = ({
   
         <main className="main-content">
           <div className="form-container">
-            <div className="form-icon-container">
-              {typeof BsChatSquareText !== 'undefined' && <BsChatSquareText className="form-icon" />} 
-            </div>
             <h2>Welcome Back</h2>
             <p className="subtitle">Sign in to your account</p>
   

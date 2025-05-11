@@ -5,7 +5,7 @@ python -m venv venv<br>
 source venv/bin/activate  # on Linux/macOS<br>
 venv\Scripts\activate     # on Windows<br>
 ### installing dependencies
-pip install fastapi uvicorn sqlalchemy pydantic python-jose[cryptography] passlib[bcrypt] python-multipart motor<br>
+pip install fastapi uvicorn sqlalchemy pydantic python-jose[cryptography] passlib[bcrypt] python-multipart motor pydantic_settings pydantic[email] pymongo<br>
 pip install -r requirements.txt #optional, only if the dependencies did not work.<br>
 ### turn on localhost
 uvicorn main:app --reload<br>

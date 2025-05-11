@@ -6,9 +6,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class GlobalSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    ENVIRONTMENT: str = "development"
+    ENVIRONMENT: str = "development"
     # app settings
-    ALLOWED_ORIGINS: str = "http://127.0.0.1:3000,http://localhost:3000"
+    ALLOWED_ORIGINS: str 
 
     # Logging
     LOG_LEVEL: int = logging.DEBUG
@@ -18,13 +18,24 @@ class GlobalSettings(BaseSettings):
 
     # MongoDB
     MONGODB_URL: str = "mongodb+srv://a69966699:76KCEQTNPvHvpqXH@userinfo.noqb9gh.mongodb.net/?retryWrites=true&w=majority&appName=UserInfo"
-    MONGODB_DB_NAME: str = "chatapp" 
-    
+    MONGODB_DB_NAME: str = "chatapp"
+    USERS_COLLECTION: str = "users"
     # Authentication
-    SECRET_KEY: str = "IT‑E15"
+    SECRET_KEY: str = "IT-E15"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 60
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # SMTP
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = "secureweb.project@gmail.com"
+    SMTP_PASSWORD: str 
+    EMAIL_FROM: str = "ChatApp Support"
+
+    # Password-reset URL
+    FRONTEND_URL: str 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./chatapp.db"
 
 def get_settings():

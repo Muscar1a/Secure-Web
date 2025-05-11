@@ -1,12 +1,15 @@
 import re
 from pydantic import BaseModel, field_validator
 
+from schemas.chat import MessageRecipient
+
 class UserBase(BaseModel):
     username: str
     email: str
 
 class UserCreate(UserBase):
     password: str
+    # password2: str
 
 
     @field_validator("password")
@@ -22,12 +25,27 @@ class UserCreate(UserBase):
         # at least one uppercase letter
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must include at least one uppercase letter")
-        
+        # at least one digit
+        if not re.search(r"\d", v):
+            raise ValueError("Password must include at least one digit")
         return v
     
     
 class User(UserBase):
     id: str
+    first_name: str | None
+    last_name: str | None
     is_active: bool
-    class Config:
-        orm_mode = True
+    is_disabled: bool
+
+class UserUpdate(User):
+    password: str | None
+    
+
+class UserInDb(User):
+    private_message_recipients: list[MessageRecipient | None]
+    group_chat_ids: list[str | None]
+
+
+class UserOfAll(User):
+    id: str
