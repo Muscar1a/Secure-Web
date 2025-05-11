@@ -6,39 +6,30 @@ import Register from './components/pages/RegisterPage';
 import ChatPage from './components/pages/ChatPage';
 import PrivateRoute from './components/PrivateRoute';
 import NavBar from './components/elements/Navbar';
-import LoadingToChatPage from './components/pages/LoadingToChat';
 
 
 
 function App() {
   return (
     <div>
-    <AuthProvider>
-      <NavBar/>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route 
-              path="/chat" 
-              element={
-                <PrivateRoute>
-                  <LoadingToChatPage />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/chat-real" 
+      <AuthProvider>
+        <NavBar />
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/chat"
               element={
                 <PrivateRoute>
                   <ChatPage />
                 </PrivateRoute>
-              } 
+              }
             />
-          <Route path="/" element={<Navigate to="/login" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </div>
   );
 }

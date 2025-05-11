@@ -19,11 +19,22 @@ const ChatPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [messageInput, setMessageInput] = useState("");
 
-  console.log('ChatPage user:', user);
+  // console.log('ChatPage user:', user);
 
   const socketRef = useRef(null);
 
-  // Load contacts
+  //* reload to assure user is logged in
+  // ################################################## //
+  useEffect(() => {
+    const hasReloaded = sessionStorage.getItem('chatPageReloaded');
+    if (!hasReloaded) {
+      sessionStorage.setItem('chatPageReloaded', 'true');
+      window.location.reload();
+    }
+  }, []);
+  // ################################################## //
+  //* Load contacts
+  // ################################################## //
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -43,24 +54,75 @@ const ChatPage = () => {
     }
   }, [token]);
 
+  // ################################################## //
+  //* fetch/create chat with recipient
+  // ################################################## //
 
-  // Connect to WebSocket when currentChatId changes
+  const fetchOrCreateChat = async (recipientId) => {
+    console.log("--> fetchOrCreateChat called with recipientId:", recipientId);
+    try {
+      // Get API for chat_id
+      const response = await axios.get(`${host}/chat/private/recipient/chat-id/${recipientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Recipients fetched:", response.data);
+      // return response.data.chat_id;
+      setCurrentChatId(response.data.chat_id);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Not found, create a new chat
+        const createResponse = await axios.get(`${host}/chat/private/recipient/create-chat/${recipientId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Chat created:", createResponse.data);
+        return createResponse.data.chat_id;
+      } else {
+        console.error("Error fetching/creating chat:", error);
+        return null;
+      }
+    }
+  }
+
+  // ################################################## //
+  //* Connect to WebSocket when currentChatId changes
+  // ################################################## //
+
   useEffect(() => {
-    if (!currentChatId || !selectedRecipient) return;
+    const connectWebsocketAndFetchMessages = async () => {
+      if (!currentChatId || !selectedRecipient) return;
 
+      console.log("Current chat ID:", currentChatId);
 
-    const token = encodeURIComponent(localStorage.getItem('token'));
-    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${token}`);
-    console.log('Connecting to WebSocket:', socket);
+      const token = encodeURIComponent(localStorage.getItem('token'));
+      const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${token}`);
+      socketRef.current = socket;
+      console.log('Connect to WebSocket:', socketRef.current, 'successfully!');
 
-    socketRef.current = socket;
-    socket.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      
+      // Load old messages
+      try {
+        const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessages(response.data);
+      } catch (error) {
+        console.error("No messages found"); //, error);
+      }
+
+      socket.onmessage = (event) => {
+        const newMessage = JSON.parse(event.data);
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      };
+      return () => {
+        socket.close();
+      };
+      
     };
-    return () => {
-      socket.close();
-    };
+    connectWebsocketAndFetchMessages();
   }, [currentChatId, selectedRecipient]);
 
   // Handle message input change
@@ -73,23 +135,18 @@ const ChatPage = () => {
     e.preventDefault();
 
     if (messageInput.trim() === '' || !socketRef.current || !selectedRecipient) return;
-
     const message = {
       sender: user.id,
       recipient: selectedRecipient.id,
       content: messageInput,
     };
+    console.log("Sending message:", message);
 
     socketRef.current.send(JSON.stringify(message));
     setMessageInput('');
   };
-
-
-  const getPrivateConversationId = (userId, contactId) => {
-    const ids = [userId, contactId].sort();
-    return `${ids[0]}_${ids[1]}`;
-  };
-
+  // ################################################## //
+  // TODO: need to see why the code does not load old messages, it seems that function is not called
   // Render contact list
   const renderContactList = () => {
     if (!Array.isArray(contacts)) {
@@ -98,18 +155,18 @@ const ChatPage = () => {
 
 
     return contacts.map((contact, idx) => {
-      console.log(`contact[${idx}]`, contact);
-      console.log(`user.dd`, user.id, `contact.id`, contact.id);
+      // console.log(`contact[${idx}]`, contact);
+      // console.log(`user.id`, user.id, `contact.id`, contact.id);
 
-      const conversationId = getPrivateConversationId(user.id, contact.id);
-      const isActive = currentChatId === conversationId;
+      const isActive = selectedRecipient?.id === contact.id;
       return (
         <li
-          key={conversationId}
+          key={contact.id}
           className={`contact-item ${isActive ? 'active' : ''}`}
           onClick={() => {
             setSelectedRecipient(contact);
-            setCurrentChatId(conversationId);
+            const chatId = fetchOrCreateChat(contact.id);
+            setCurrentChatId(chatId);
           }}
         >
           {contact.first_name || ''} {contact.last_name || ''} (@{contact.username})
@@ -119,10 +176,11 @@ const ChatPage = () => {
   };
 
 
-  if (loading) {
+
+  if (loading || !user) {
     return <div className="loading-screen">Loading...</div>;
   }
-  
+
   const userName = user?.username || user?.name || 'User';
 
 
@@ -157,13 +215,8 @@ const ChatPage = () => {
             <BsPeople className="sidebar-icon" />
             Contacts
           </div>
-          {/* <div className="sidebar-filter">
-            <input type="checkbox" id="show-online" />
-            <label htmlFor="show-online">Show online only</label>
-          </div> */}
           <ul className="contact-list">
             {renderContactList()}
-
           </ul>
         </aside>
 
@@ -171,7 +224,10 @@ const ChatPage = () => {
           <div className="chat-window">
             <div className="chat-messages">
               {messages.map((msg, index) => (
-                <div key={index} className={`message ${msg.sender === user.id ? "sent" : "received"}`}>
+                <div
+                  key={index} 
+                  className={`message ${msg.sender === user.id ? "sent" : "received"}`}
+                >
                   <p>{msg.content}</p>
                 </div>
               ))}
