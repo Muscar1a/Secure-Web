@@ -192,12 +192,3 @@ class PrivateChatManager(BaseChatManager):
         )
 
 
-
-"""------------------------Section: handle messages------------------------"""
-# Section: handle messages
-
-"""
-async def db_get_messages(chat_id: str, db: AsyncIOMotorDatabase):
-    chat = await db_get_chat(chat_id, db, collection='privateChat')
-    return chat.get('messages')
-"""

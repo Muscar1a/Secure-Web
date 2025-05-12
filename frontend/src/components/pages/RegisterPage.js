@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import RegisterView from '../elements/RegisterView';
+import { host } from '../../utils/APIRoutes';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/users/register', {
+      const response = await axios.post(`${host}/users/register`, {
         username,
         email,
         password

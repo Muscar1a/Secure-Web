@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { host } from '../utils/APIRoutes';
 
 export const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    // const user = JSON.parse(localStorage.getItem('user') || 'null');
 
     const verifyToken = async () => {
       if (!token) {
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         //verify token
-        const response = await axios.get('http://localhost:8000/users/me', {
+        const response = await axios.get(`${host}/users/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
