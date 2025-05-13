@@ -92,9 +92,9 @@ const ChatPage = () => {
       });
       return response.data.chat_id;
     } catch (error) {
-      console.log("Error fetching chat ID:", error);
       if (error.response && error.response.status === 404) {
-        const createResponse = await axios.post(`${host}/chat/private/recipient/create-chat/${recipientId}`, {}, {
+        console.log("Chat not found, creating new chat.");
+        const createResponse = await axios.get(`${host}/chat/private/recipient/create-chat/${recipientId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log("Chat created:", createResponse.data);

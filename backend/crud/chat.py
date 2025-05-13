@@ -107,10 +107,12 @@ class PrivateChatManager(BaseChatManager):
         current_user_id: str,
         recipient_id: str
     ) -> schemas.PrivateChat:
-
+        print("-" * 50)
+        print("-" * 50)
+        
         ids = [current_user_id, recipient_id]
         new_chat = PrivateChatModel(member_ids=ids)
-        # print('new_chat', new_chat)
+        print('----- new_chat', new_chat)
 
         inserted = await self.insert_chat_to_db(new_chat)
         # print('inserted', inserted)
@@ -185,6 +187,7 @@ class PrivateChatManager(BaseChatManager):
         if user['private_message_recipients']:
             for recipient in user['private_message_recipients']:
                 if recipient['recipient_id'] == recipient_id:
+                    print('--> recipient: ', recipient)
                     return recipient
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
