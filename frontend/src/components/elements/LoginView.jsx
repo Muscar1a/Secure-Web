@@ -1,8 +1,8 @@
-import React, { useState } from 'react'; // Thêm useState
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { BsChatSquare } from 'react-icons/bs'; // Bỏ BsChatSquareText nếu không dùng
-import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi'; // Thêm FiEyeOff
+import { BsChatSquare } from 'react-icons/bs';
+import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdOutlineMailOutline } from 'react-icons/md';
 import { FaUserFriends, FaRegImage, FaRegCommentDots } from "react-icons/fa";
 import { BsFillGrid3X3GapFill, BsGearFill } from "react-icons/bs";
@@ -18,7 +18,7 @@ const LoginView = ({
     setPassword,
     handleSubmit
 }) => {
-    const [showPassword, setShowPassword] = useState(false); // State mới cho việc hiển thị mật khẩu
+    const [showPassword, setShowPassword] = useState(false);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -29,13 +29,11 @@ const LoginView = ({
         <header className="header">
            <div className="logo">
              {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
-              TriSec
+              TriSec {/* Bạn có thể đổi thành Chatty nếu muốn */}
            </div>
-           {/* Sử dụng Link trực tiếp bao quanh button hoặc chỉ icon nếu muốn */}
-           <Link to="/settings" className="settings-link-wrapper">
-          <a href="/settings" className="nav-item">
-            <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
-          </a>
+           <Link to="/settings" className="nav-item settings-button"> {/* Sử dụng class nav-item cho nhất quán nếu có và settings-button */}
+             {typeof IoSettingsOutline !== 'undefined' && <IoSettingsOutline className="settings-icon" style={{ marginRight: '5px', verticalAlign: 'middle' }} />} 
+             Settings
            </Link>
         </header>
   
@@ -55,7 +53,7 @@ const LoginView = ({
                       id="login-username" 
                       name="username" 
                       type="text" 
-                      placeholder="Username"
+                      placeholder="Username or Email" // Có thể cho phép nhập cả email
                       value={username} 
                       onChange={(e) => setUsername(e.target.value)} 
                       required
@@ -76,13 +74,17 @@ const LoginView = ({
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    {/* Icon thay đổi và có onClick */}
                     {showPassword ? (
                         <FiEyeOff className="password-toggle" onClick={togglePasswordVisibility} title="Hide password" />
                     ) : (
                         <FiEye className="password-toggle" onClick={togglePasswordVisibility} title="Show password" />
                     )}
                  </div>
+              </div>
+              
+              {/* THÊM LINK QUÊN MẬT KHẨU Ở ĐÂY */}
+              <div className="forgot-password-link">
+                <Link to="/forgot-password">Forgot Password?</Link>
               </div>
   
               <button type="submit" className="submit-button" disabled={loading}>
@@ -107,6 +109,7 @@ const LoginView = ({
               <div className="community-item"><BsFillGrid3X3GapFill /></div>
             </div>
             <h3>Welcome back!</h3> 
+            <p>Sign in to continue your journey with us and reconnect with your community.</p>
           </div>
   
         </main> 

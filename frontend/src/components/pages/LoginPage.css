@@ -294,6 +294,39 @@
     text-align: center;
 }
 
-/* Responsive styles (giữ nguyên hoặc điều chỉnh nếu cần) */
-/* @media (max-width: 900px) { ... } */
-/* @media (max-width: 500px) { ... } */
+/* LoginPage.css hoặc file CSS liên quan */
+
+/* ... (các style hiện tại của bạn) ... */
+
+.forgot-password-link {
+  text-align: right; /* Căn phải, hoặc center, left tùy ý bạn */
+  margin-top: -10px; /* Điều chỉnh để nó nằm gần ô password hơn, trước nút Sign In */
+  margin-bottom: 20px; /* Khoảng cách với nút Sign In */
+  font-size: 0.85rem;
+}
+
+.forgot-password-link a {
+  color: var(--secondary-text-color); /* Hoặc màu accent nếu muốn nổi bật hơn */
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.forgot-password-link a:hover {
+  color: var(--accent-color); /* Màu accent khi hover */
+  text-decoration: underline;
+}
+
+/* Điều chỉnh lại margin-top của submit-button nếu cần */
+.submit-button {
+  /* ... */
+  margin-top: 10px; /* Hoặc giá trị khác sau khi đã có link forgot password */
+}
+
+.signup-link { 
+  text-align: center;
+  margin-top: 25px; /* Đảm bảo có khoảng cách hợp lý */
+  font-size: 0.9rem;
+  color: var(--secondary-text-color); 
+}
+
+/* ... (các style khác) ... */

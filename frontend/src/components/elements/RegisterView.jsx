@@ -122,9 +122,9 @@ const RegisterView = ({
                         <button type="submit" className="submit-button" disabled={loading}>
                             {loading ? 'Creating Account...' : 'Create Account'}
                         </button>
-                        <span className='signin-link'>
-                        Already have an account? <Link to="/login">Sign in</Link>
-                    </span>
+                    <div className="form-link"> {/* Hoặc giữ nguyên là "signin-link" */}
+                      Already have an account? <Link to="/login">Sign in</Link>
+                    </div>
                     </form>
 
 

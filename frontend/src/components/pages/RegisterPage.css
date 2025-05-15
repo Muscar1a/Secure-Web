@@ -284,3 +284,28 @@
     font-size: 0.9rem;
     text-align: center;
 }
+
+/* RegisterPage.css */
+/* ... (các style khác của bạn) ... */
+
+.form-link { /* Hoặc .signin-link nếu bạn không đổi tên class trong JSX */
+  text-align: center;
+  margin-top: 25px; 
+  font-size: 0.9rem;
+  color: var(--secondary-text-color); 
+}
+
+.form-link a { /* Hoặc .signin-link a */
+  color: var(--accent-color); 
+  font-weight: 600; /* Chữ đậm cho link */
+  text-decoration: none; /* Bỏ gạch chân mặc định */
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+  margin-left: 5px; /* Tạo khoảng cách nhỏ */
+}
+
+.form-link a:hover { /* Hoặc .signin-link a:hover */
+  color: var(--button-primary-hover-bg); /* Sử dụng màu hover của nút chính, hoặc một màu accent sáng hơn */
+  /* Hoặc: filter: brightness(1.2); */
+  text-decoration: underline; /* Thêm gạch chân khi hover */
+}
+

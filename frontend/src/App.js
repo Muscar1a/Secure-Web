@@ -8,6 +8,7 @@ import RegisterPage from './components/pages/RegisterPage';
 import ChatPage from './components/pages/ChatPage';
 import SettingsPage from './components/pages/SettingsPage';
 import PrivateRoute from './components/PrivateRoute';
+import ForgotPasswordPage from './components/pages/ForgotPasswordPage'
 
 // Layout cho các trang private (đã đăng nhập)
 // NavBar ở đây sẽ được áp dụng theme
@@ -30,17 +31,17 @@ const PublicLayout = () => (
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider> {/* <<<< ThemeProvider BAO BỌC TOÀN BỘ Router */}
+      <ThemeProvider> 
         <Router>
           <Routes>
-            {/* Public routes - SẼ ĐƯỢC ÁP DỤNG THEME */}
-            <Route element={<PublicLayout />}> {/* Hoặc render trực tiếp không cần PublicLayout */}
+            <Route element={<PublicLayout />}> 
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/settings" element={<SettingsPage />} /> 
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} /> 
+              <Route path="/reset-password/:urlToken" element={<ForgotPasswordPage />} /> 
             </Route>
 
-            {/* Private routes - SẼ ĐƯỢC ÁP DỤNG THEME */}
             <Route 
               element={
                 <PrivateRoute>
