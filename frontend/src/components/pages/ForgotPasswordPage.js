@@ -46,7 +46,7 @@ const ForgotPasswordPage = () => {
     setSuccessMessage('');
     setLoading(true);
     try {
-      const response = await axios.post(`${host}/users/request-password-reset`, { email });
+      const response = await axios.post(`${host}/auth/request-password-reset`, { email });
       setSuccessMessage(response.data.msg || "If that email is registered, you’ll receive reset instructions.");
     } catch (err) {
       console.error('Request password reset error:', err.response?.data || err.message);
@@ -72,7 +72,7 @@ const ForgotPasswordPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${host}/users/reset-password`, {
+      const response = await axios.post(`${host}/auth/reset-password`, {
         token: token, 
         new_password: newPassword,
       });

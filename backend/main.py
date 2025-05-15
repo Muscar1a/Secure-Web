@@ -37,15 +37,14 @@ async def shutdown_event():
 #   CORS
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=["http://localhost:3000", "http://localhost:8000"],
-    allow_origins=['*'],
+    allow_origins=["http://localhost:3000", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 #   API ROUTERS
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/auth")
 app.include_router(users.router)
 app.include_router(chat.router)
 
