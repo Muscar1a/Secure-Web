@@ -32,8 +32,9 @@ const RegisterView = ({
                     <BsGrid3X3GapFill className="logo-icon" />
                     TriSec
                 </div>
-                <button className="settings-button">
-                    <IoSettingsOutline className="settings-icon" />
+                <button className="settings-button" >
+                <IoSettingsOutline className="settings-icon" />
+                Setting
                 </button>
             </header>
 

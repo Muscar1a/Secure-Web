@@ -19,6 +19,8 @@
     flex-shrink: 0;
     width: 100%;
     box-sizing: border-box;
+    flex-shrink: 0; 
+
 }
 
 .settings-back-button {
@@ -199,15 +201,6 @@
     margin-top: 10px;
 }
 
-.chat-preview-area-wrapper.preview-theme-light {
-    --bg-color: #F0F0F0; --sidebar-bg-color: #FFFFFF; --text-color: #333333; --accent-color: #007BFF; --secondary-text-color: #6c757d; --divider-color: #DEE2E6; --sent-message-bg": #007BFF; --sent-message-text": #FFFFFF; --received-message-bg": #E9ECEF; --received-message-text": #333333; --input-bg-color": #FFFFFF; --input-border-color": #CED4DA; --avatar-bg-color": #E9ECEF; --avatar-text-color": #007BFF; --button-primary-bg": #007BFF; --button-primary-text": #FFFFFF;
-}
-.chat-preview-area-wrapper.preview-theme-dark {
-    --bg-color: #211F26; --sidebar-bg-color: #1A181F; --text-color: #e0e0e0; --accent-color: #D89E40; --secondary-text-color: #a0a0a0; --divider-color": #3a3740; --sent-message-bg": #D89E40; --sent-message-text": #1A181F; --received-message-bg": #2E2B36; --received-message-text": #e0e0e0; --input-bg-color": #2E2B36; --input-border-color": #4a4750; --avatar-bg-color": #2E2B36; --avatar-text-color": #D89E40; --button-primary-bg": #D89E40; --button-primary-text": #1A181F;
-}
-.chat-preview-area-wrapper.preview-theme-retro {
-    --bg-color: #FDF6E3; --sidebar-bg-color: #F9E9C4; --text-color: #655A4E; --accent-color": "#D35400"; --secondary-text-color": "#8A7967"; --divider-color": "#DCD0B4"; --sent-message-bg": "#E74C3C"; --sent-message-text": "#FFFFFF"; --received-message-bg": "#F5E0B3"; --received-message-text": "#655A4E"; --input-bg-color": "#FFFFFF"; --input-border-color": "#DCD0B4"; --avatar-bg-color": "#F5E0B3"; --avatar-text-color": "#D35400"; --button-primary-bg": "#D35400"; --button-primary-text": "#FFFFFF";
-}
 
 .preview-chat-window {
     background-color: var(--bg-color);

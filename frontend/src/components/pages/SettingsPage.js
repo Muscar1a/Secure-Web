@@ -49,7 +49,6 @@ const SettingsPage = () => {
         <button onClick={goBack} className="settings-back-button">
           <IoArrowBack /> Back
         </button>
-        <h2 className="settings-main-title">Settings</h2>
       </div>
 
       <div className="settings-content">
