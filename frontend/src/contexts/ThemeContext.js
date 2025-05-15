@@ -21,7 +21,7 @@ export const ThemeProvider = ({ children }) => {
   }, [selectedPreviewTheme]);
 
   const previewTheme = useCallback((themeName) => {
-    const themeKey = themeName.toLowerCase(); // Đảm bảo key là lowercase
+    const themeKey = themeName.toLowerCase(); 
     if (themes[themeKey]) {
       setSelectedPreviewTheme(themeKey);
     } else {

@@ -4,6 +4,9 @@ import './Settings.css';
 import { useNavigate } from 'react-router-dom';
 import { IoArrowBack, IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { themes as themeList } from '../../utils/themeUtils';
+import { BsChatSquare } from 'react-icons/bs';
+
+
 
 const SettingsPage = () => {
   const { currentTheme, selectedPreviewTheme, previewTheme, applySelectedTheme, cancelPreviewTheme } = useContext(ThemeContext);
@@ -46,6 +49,10 @@ const SettingsPage = () => {
   return (
     <div className="settings-page-container">
       <div className="settings-page-header">
+           <div className="logo">
+             {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
+              TriSec
+           </div>
         <button onClick={goBack} className="settings-back-button">
           <IoArrowBack /> Back
         </button>

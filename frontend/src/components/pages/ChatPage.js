@@ -261,8 +261,11 @@ const ChatPage = () => {
   return (
     <div className="chat-page">
       <header className="chat-header">
-        <div className="header-title">TriSec</div>
-        <nav className="header-nav">
+           <div className="logo">
+             {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
+              TriSec
+           </div>        
+           <nav className="header-nav">
           <a href="/settings" className="nav-item">
             <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
           </a>
@@ -270,7 +273,7 @@ const ChatPage = () => {
             <CgProfile style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Profile
           </a>
           <button onClick={logout} className="nav-item nav-item-logout">
-            <BiLogOut style={{ marginRight: '5px', verticalAlign: 'middle' }} />
+            <BiLogOut style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Logout
           </button>
         </nav>
       </header>

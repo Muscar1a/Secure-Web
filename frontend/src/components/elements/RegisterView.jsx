@@ -28,14 +28,13 @@ const RegisterView = ({
     return (
         <div className="register-page">
             <header className="header">
-                <div className="logo">
-                    <BsGrid3X3GapFill className="logo-icon" />
-                    TriSec
-                </div>
-                <button className="settings-button" >
-                <IoSettingsOutline className="settings-icon" />
-                Setting
-                </button>
+           <div className="logo">
+             {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
+              TriSec
+           </div>
+          <a href="/settings" className="nav-item">
+            <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
+          </a>
             </header>
 
             <main className='main-content'>

@@ -79,16 +79,18 @@ export const themes = {
 };
 
 export const applyThemeToDOM = (themeName) => {
-  const theme = themes[themeName];
+  const theme = themes[themeName]; 
   if (!theme) {
-    console.warn(`Theme "${themeName}" not found. Applying default (light).`);
-    applyThemeToDOM(themes.light.name.toLowerCase());
     return;
   }
-  const root = document.documentElement;
+  const root = document.documentElement; 
+
+
   Object.keys(theme.colors).forEach(key => {
-    root.style.setProperty(key, theme.colors[key]);
+    root.style.setProperty(key, theme.colors[key]); 
   });
+
+  localStorage.setItem('selectedTheme', themeName); 
 };
 
 export const getInitialTheme = () => {
@@ -102,3 +104,4 @@ export const getInitialTheme = () => {
   }
   return 'light';
 };
+

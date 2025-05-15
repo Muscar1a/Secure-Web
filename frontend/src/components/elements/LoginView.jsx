@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react'; // Thêm useState
 import { Link } from 'react-router-dom';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { BsChatSquare, BsChatSquareText } from 'react-icons/bs';
-import { FiLock, FiEye } from 'react-icons/fi';
+import { BsChatSquare } from 'react-icons/bs'; // Bỏ BsChatSquareText nếu không dùng
+import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi'; // Thêm FiEyeOff
 import { MdOutlineMailOutline } from 'react-icons/md';
 import { FaUserFriends, FaRegImage, FaRegCommentDots } from "react-icons/fa";
 import { BsFillGrid3X3GapFill, BsGearFill } from "react-icons/bs";
@@ -18,6 +18,12 @@ const LoginView = ({
     setPassword,
     handleSubmit
 }) => {
+    const [showPassword, setShowPassword] = useState(false); // State mới cho việc hiển thị mật khẩu
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <div className="login-page">
         <header className="header">
@@ -25,10 +31,12 @@ const LoginView = ({
              {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
               TriSec
            </div>
-           <button className="settings-button">
-             {typeof IoSettingsOutline !== 'undefined' && <IoSettingsOutline className="settings-icon" />} 
-              Settings
-           </button>
+           {/* Sử dụng Link trực tiếp bao quanh button hoặc chỉ icon nếu muốn */}
+           <Link to="/settings" className="settings-link-wrapper">
+          <a href="/settings" className="nav-item">
+            <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
+          </a>
+           </Link>
         </header>
   
         <main className="main-content">
@@ -42,7 +50,7 @@ const LoginView = ({
               <div className="input-group">
                 <label htmlFor="login-username">Username</label> 
                 <div className="input-wrapper">
-                   {typeof MdOutlineMailOutline !== 'undefined' && <MdOutlineMailOutline className="input-icon" />} {/* Email Icon */}
+                   {typeof MdOutlineMailOutline !== 'undefined' && <MdOutlineMailOutline className="input-icon" />}
                    <input
                       id="login-username" 
                       name="username" 
@@ -62,13 +70,18 @@ const LoginView = ({
                     <input
                       id="login-password"
                       name="password"
-                      type="password" 
+                      type={showPassword ? 'text' : 'password'}  
                       placeholder="••••••••"
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    {typeof FiEye !== 'undefined' && <FiEye className="password-toggle" title="Show password (requires code change)" />}
+                    {/* Icon thay đổi và có onClick */}
+                    {showPassword ? (
+                        <FiEyeOff className="password-toggle" onClick={togglePasswordVisibility} title="Hide password" />
+                    ) : (
+                        <FiEye className="password-toggle" onClick={togglePasswordVisibility} title="Show password" />
+                    )}
                  </div>
               </div>
   
