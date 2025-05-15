@@ -263,10 +263,10 @@ const ChatPage = () => {
       <header className="chat-header">
         <div className="header-title">TriSec</div>
         <nav className="header-nav">
-          <a href="#!" className="nav-item">
+          <a href="/settings" className="nav-item">
             <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
           </a>
-          <a href="#!" className="nav-item">
+          <a href="/profile" className="nav-item">
             <CgProfile style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Profile
           </a>
           <button onClick={logout} className="nav-item nav-item-logout">
