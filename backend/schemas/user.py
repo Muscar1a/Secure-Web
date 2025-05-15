@@ -1,5 +1,6 @@
 import re
 from pydantic import BaseModel, field_validator
+from typing import Optional
 
 from schemas.chat import MessageRecipient
 
@@ -31,18 +32,24 @@ class UserCreate(UserBase):
         return v
     
     
-class User(UserBase):
+class UserRead(UserBase):
     id: str
     first_name: str | None
     last_name: str | None
     is_active: bool
     is_disabled: bool
+User = UserRead
+class UserUpdate(BaseModel):
+    id: str
+    username: Optional[str]   = None
+    email: Optional[str]      = None
+    first_name: Optional[str] = None
+    last_name: Optional[str]  = None
+    is_active: Optional[bool] = None
+    is_disabled: Optional[bool] = None
+    password: Optional[str]   = None
 
-class UserUpdate(User):
-    password: str | None
-    
-
-class UserInDb(User):
+class UserInDb(UserRead):
     private_message_recipients: list[MessageRecipient | None]
     group_chat_ids: list[str | None]
 
