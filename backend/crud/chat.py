@@ -57,6 +57,9 @@ class BaseChatManager:
         current_user_id: str,
         chat_id: str,
         message: str,
+        encrypted_key_sender: str,
+        encrypted_key_receiver: str,
+        iv: str
     ) -> schemas.Message:
 
         chat = await self.get_chat_by_id(chat_id)
@@ -67,7 +70,12 @@ class BaseChatManager:
                 detail='Message was not sent!'
             )
 
-        new_message = MessageModel(created_by=current_user_id, message=message[1:-1])
+        new_message = MessageModel(
+            created_by=current_user_id, message=message,
+            encrypted_key_sender=encrypted_key_sender,
+            encrypted_key_receiver=encrypted_key_receiver,
+            iv=iv
+        )
         print('\n - new_message full', new_message.model_dump())
         print('\n - new_message message only', new_message.model_dump()['message'])
         print('\n - new_message type', type(new_message.model_dump()['message']))
@@ -182,12 +190,12 @@ class PrivateChatManager(BaseChatManager):
         # user = await self.chat_collection.find_one(query)
 
         user = await self.user_manager.get_by_id(current_user_id)
-        print('-------------user: ', user)
+        # print('-------------user: ', user)
         # print('user[\'private_message_recipients\']: ', user['private_message_recipients'] )
         if user['private_message_recipients']:
             for recipient in user['private_message_recipients']:
                 if recipient['recipient_id'] == recipient_id:
-                    print('--> recipient: ', recipient)
+                    # print('--> recipient: ', recipient)
                     return recipient
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

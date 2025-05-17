@@ -7,10 +7,12 @@ class UserBase(BaseModel):
     username: str
     email: str
 
+    public_key_pem: str
+    private_key_pem: str
+
 class UserCreate(UserBase):
     password: str
     # password2: str
-
 
     @field_validator("password")
     def password_complexity(cls, v: str) -> str:

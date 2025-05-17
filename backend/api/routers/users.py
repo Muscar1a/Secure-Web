@@ -19,6 +19,7 @@ async def register(
     user_in: schemas.UserCreate,
     user_manager: User = Depends(get_user_manager),
 ):
+    print('---->user_in', user_in)
     try:
         new_user = await user_manager.create_user(user_in)
         return new_user
@@ -87,3 +88,13 @@ async def delete_user(
 ):
     deleted_user = await user_manager.delete_user(user_id)
     return deleted_user
+
+
+@router.get("/public_key/{user_id}")
+async def get_public_key(
+    user_id: str,
+    user_manager: User = Depends(get_user_manager),
+    current_user: schemas.User = Depends(get_current_active_user)
+):
+    public_key = await user_manager.get_public_key(user_id)
+    return public_key

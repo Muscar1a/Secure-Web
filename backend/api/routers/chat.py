@@ -84,6 +84,8 @@ async def get_private_messages(
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
-    return await pvt_chat_manager.get_chat_messages(chat_id)
+    temp = await pvt_chat_manager.get_chat_messages(chat_id)
+    print ('temp: ', temp[0].keys())
+    return temp
 
 

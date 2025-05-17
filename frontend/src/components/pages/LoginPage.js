@@ -37,6 +37,11 @@ const Login = () => {
         loading: false
       });
 
+      /* Lmao 
+      const encrypted = CryptoJS.AES.encrypt(password, SK).toString();
+      sessionStorage.setItem('password', encrypted);
+      */
+      
       //get user
       const userResponse = await axios.get(`${host}/users/me`, {
         headers: {

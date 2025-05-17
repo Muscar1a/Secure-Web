@@ -1,4 +1,5 @@
 
+import json
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from api.deps import get_private_chat_manager, get_token_manager
@@ -34,9 +35,17 @@ async def chat_websocket_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
-            
+            # json_str = message.decode("utf-8")  # decode bytes -> string
+            data = json.loads(message)
+            # print(f"[--------] Received message: {data.keys()}")
             if chat_type == 'private':
-                new_message = await pvt_chat_manager.create_message(current_user['id'], chat_id, message)
+                new_message = await pvt_chat_manager.create_message(
+                    current_user['id'], chat_id, 
+                    data['message'], 
+                    data['encrypted_key_sender'],
+                    data['encrypted_key_receiver'],
+                    data['iv'],
+                )
 
             serialized_message = message_serializer(new_message.model_dump())
             print("[Response Message]", serialized_message)

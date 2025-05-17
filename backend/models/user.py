@@ -19,7 +19,8 @@ class UserModel(BaseModel):
     is_superuser: bool = False               
     private_message_recipients: list[MessageRecipient | None] = Field([])
     group_chat_ids: list[str | None] = Field([])
-
+    public_key_pem: str
+    private_key_pem: str
 
     class Config:
         # allow_population_by_field_name = True
