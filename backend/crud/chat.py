@@ -138,7 +138,7 @@ class PrivateChatManager(BaseChatManager):
         for user_id, recipient_id in message_recipients:
             recipient_model = MessageRecipientModel(
                 recipient_id=recipient_id, chat_id=new_chat.chat_id)
-            print('recipient_model', recipient_model)
+            # print('recipient_model', recipient_model)
 
             # add chat_id to member's private_message_recipients field
             insertd = await self.user_manager.insert_private_message_recipient(
