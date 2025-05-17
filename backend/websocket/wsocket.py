@@ -44,8 +44,9 @@ async def chat_websocket_endpoint(
             data = json.loads(message)
             # print(f"[--------] Received message: {data.keys()}")
             if chat_type == 'private':
+                # print(f'[-] current_user: {current_user}')
                 new_message = await pvt_chat_manager.create_message(
-                    current_user['id'], chat_id, 
+                    current_user.id, chat_id, 
                     data['message'], 
                     data['encrypted_key_sender'],
                     data['encrypted_key_receiver'],

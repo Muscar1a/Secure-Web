@@ -9,7 +9,7 @@ import { CgProfile } from 'react-icons/cg';
 import { BiLogOut } from 'react-icons/bi';
 import { generateAESKeyAndIV, encryptMessageWithAES, encryptAESKeyWithRSA } from '../../utils/Encryption';
 import { decryptPrivateKey, decryptAESKeyWithPrivateKey, decryptMessageWithAES } from '../../utils/Decryption';
-
+import { Link } from 'react-router-dom';
 import forge from 'node-forge';
 
 
@@ -202,7 +202,7 @@ const ChatPage = () => {
           });
           // console.log("New messages fetched:", response.data);
           // setMessages(response.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
-          console.log("[-] response.data:", response);
+          // console.log("[-] response.data:", response);
           const myEncryptedPrivateKeyPem = user.private_key_pem;
           const myPublicKeyPem = user.public_key_pem;
           const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
