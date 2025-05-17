@@ -9,20 +9,17 @@ import ChatPage from './components/pages/ChatPage';
 import SettingsPage from './components/pages/SettingsPage';
 import PrivateRoute from './components/PrivateRoute';
 import ForgotPasswordPage from './components/pages/ForgotPasswordPage'
+import ProfilePage from './components/pages/ProfilePage';
 
-// Layout cho các trang private (đã đăng nhập)
-// NavBar ở đây sẽ được áp dụng theme
 const PrivateLayout = () => (
   <>
     <Outlet />
   </>
 );
 
-// (Tùy chọn) Layout cho các trang public nếu bạn muốn có cấu trúc chung
-// Nếu không, bạn có thể render LoginPage, RegisterPage, SettingsPage trực tiếp
+
 const PublicLayout = () => (
     <>
-        {/* Có thể có một PublicNavBar ở đây nếu cần, nó cũng sẽ được áp dụng theme */}
         <Outlet />
     </>
 );
@@ -49,6 +46,7 @@ function App() {
                 </PrivateRoute>
               }
             >
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/chat" element={<ChatPage />} />
             </Route>
             
