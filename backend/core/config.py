@@ -3,6 +3,8 @@ import logging
 import os
 from random import randint
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
 class GlobalSettings(BaseSettings):
     # app settings
@@ -36,6 +38,11 @@ class GlobalSettings(BaseSettings):
 
     # Password-reset URL
     FRONTEND_URL: str = Field(..., env="FRONTEND_URL")
+
+    # SSL/TLS
+    ssl_keyfile_path: Optional[str] = None
+    ssl_certfile_path: Optional[str] = None
+
 
     class Config:
         env_file = ".env"

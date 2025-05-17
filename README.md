@@ -8,7 +8,7 @@ venv\Scripts\activate     # on Windows<br>
 pip install fastapi uvicorn sqlalchemy pydantic python-jose[cryptography] passlib[bcrypt] python-multipart motor pydantic_settings pydantic[email] pymongo<br>
 pip install -r requirements.txt #optional, only if the dependencies did not work.<br>
 ### turn on localhost
-uvicorn main:app --reload<br>
+uvicorn main:app --port 8000 --reload --ssl-keyfile ./key.pem --ssl-certfile ./cert.pem<br>
 
 # frontend
 cd frontend<br>

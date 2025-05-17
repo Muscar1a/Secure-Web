@@ -1,56 +1,49 @@
+/* RegisterPage.css - Đã sửa để DÙNG BIẾN CSS TỪ THEME */
 
-html, body, #root { 
-  height: 100%; 
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+/* Bỏ khai báo màu cố định cho html, body ở đây nếu themeUtils.js đã xử lý cho <html> */
+/* body {
   background-color: #121212; 
-  color: #e0e0e0; 
-}
+} */
 
 .register-page {
-  background-color: #1a1a1a; 
+  background-color: var(--bg-color); /* <<<< SỬ DỤNG BIẾN */
+  color: var(--text-color); /* <<<< SỬ DỤNG BIẾN */
   width: 100vw;           
   height: 100vh;        
   display: flex;
   flex-direction: column;
   overflow-y: auto; 
-  justify-content: center;
+  /* justify-content: center; */ /* Bỏ nếu có header */
 }
 
-
-.header {
+.header { /* Header của trang Register */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
-  border-bottom: 1px solid #333; 
-  background-color: #1f1f1f; 
+  padding: 15px 30px;
+  background-color: var(--sidebar-bg-color); /* Hoặc --header-bg-color */
   flex-shrink: 0; 
+  border-bottom: 1px solid var(--divider-color);
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #cfa14a; 
+  font-size: 1.3em;
+  font-weight: 600; 
+  color: var(--accent-color); 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 8px; 
 }
 
 .logo-icon {
-  font-size: 1.4rem;
-  display: flex;
-  justify-content: center;
+  font-size: 1.2em; 
+  color: var(--accent-color); 
 }
 
 .settings-button {
   background: none;
   border: none;
-  color: #b0b0b0; 
+  color: var(--secondary-text-color); 
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -58,59 +51,62 @@ body {
   gap: 6px;
   transition: color 0.2s ease;
 }
-
 .settings-button:hover {
-    color: #e0e0e0;
+    color: var(--accent-color);
 }
-
 .settings-icon {
-   font-size: 1.1rem;
+   font-size: 1.1rem; 
 }
-
 
 .main-content {
   display: flex;
-  flex-grow: 1; 
-  padding: 50px 40px; 
-  gap: 60px; 
-  justify-content: center; 
+  flex-grow: 1;
+  padding: 40px 30px;
+  gap: 50px; 
+  justify-content: center;
   align-items: center;
-  overflow: hidden; 
 }
 
-
 .form-container {
-  flex: 1; 
-  max-width: 450px; 
+  flex: 0 1 480px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
-
+  background-color: var(--sidebar-bg-color); /* Nền form */
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border: 1px solid var(--divider-color);
 }
 
 .form-icon-container {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .form-icon {
-  background-color: #2a2a2a;
-  color: #cfa14a; 
-  padding: 12px;
-  border-radius: 8px;
+  background-color: var(--input-bg-color); 
+  color: var(--accent-color); 
+  padding: 15px;
+  border-radius: 12px;
   display: inline-block;
-  font-size: 1.5rem;
+  font-size: 1.8rem; 
+  line-height: 1; 
 }
 
 .form-container h2 {
-  font-size: 1.9rem;
+  font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #ffffff;
+  color: var(--text-color);
+  text-align: center;
 }
 
 .form-container .subtitle {
-  font-size: 0.95rem;
-  color: #a0a0a0;
-  margin-bottom: 35px;
+  font-size: 0.9rem;
+  color: var(--secondary-text-color);
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .form-container form {
@@ -123,13 +119,14 @@ body {
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .input-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: #b0b0b0;
+  color: var(--secondary-text-color);
+  margin-left: 2px;
 }
 
 .input-wrapper {
@@ -143,31 +140,31 @@ body {
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #777;
+  color: var(--placeholder-text-color);
   font-size: 1rem;
   pointer-events: none;
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 12px 15px 12px 45px;
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #e0e0e0;
-  font-size: 0.95rem;
+  padding: 14px 15px 14px 45px;
+  background-color: var(--input-bg-color);
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 0.9rem;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-wrapper input::placeholder {
-  color: #777;
+  color: var(--placeholder-text-color);
 }
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: #cfa14a;
-  box-shadow: 0 0 0 2px rgba(207, 161, 74, 0.3);
+  border-color: var(--input-focus-border-color);
+  box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
 }
 
 .input-wrapper input[type="password"] {
@@ -179,164 +176,136 @@ body {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #777;
+  color: var(--placeholder-text-color);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
-
 .password-toggle:hover {
-    color: #aaa;
+    color: var(--secondary-text-color);
 }
-
 
 .submit-button {
-  background-color: #cfa14a;
-  color: #1a1a1a;
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
   border: none;
   padding: 14px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 10px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 15px;
   width: 100%;
 }
-
-.submit-button:hover {
-  background-color: #b8903a;
+.submit-button:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg);
 }
-
+.submit-button:active:not(:disabled) {
+    transform: scale(0.98);
+}
 .submit-button:disabled {
-    background-color: #8a724a;
+    background-color: var(--button-primary-hover-bg); /* Hoặc màu disabled riêng */
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
-
 .signin-link { 
   text-align: center;
-  margin-top: 30px; 
+  margin-top: 25px; 
   font-size: 0.9rem;
-  color: #a0a0a0; 
+  color: var(--secondary-text-color); 
 }
-
 .signin-link a {
-  color: #D89E40; 
+  color: var(--accent-color); 
   font-weight: 600;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+  margin-left: 4px;
 }
-
 .signin-link a:hover {
-  color: #eab65f; 
+  filter: brightness(1.2);
   text-decoration: underline;
 }
 
-.community-container {
-  flex: 1; 
-  max-width: 400px; 
+.community-container { /* Giữ nguyên style của community container nếu bạn dùng nó */
+  flex: 0 1 400px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: var(--secondary-text-color);
+  padding: 20px;
 }
-
 .community-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 15px;
   width: 100%;
-  max-width: 300px;
-  margin-bottom: 40px;
+  max-width: 280px;
+  margin-bottom: 30px;
 }
-
 .community-item {
-  background-color: #2f2f2f;
-  border-radius: 12px;
+  background-color: var(--input-bg-color); /* Nền item community */
+  border-radius: 10px;
   aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem; 
+  color: var(--secondary-text-color); /* Icon community */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
-
+.community-item:hover {
+    background-color: var(--contact-item-hover-bg);
+    color: var(--accent-color);
+}
 .community-container h3 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 15px;
-  color: #ffffff;
-}
-
-.community-container p {
-  font-size: 0.95rem;
-  color: #a0a0a0;
-  line-height: 1.6;
+  color: var(--text-color);
   text-align: center;
 }
-
+.community-container p {
+  font-size: 0.9rem;
+  color: var(--secondary-text-color);
+  line-height: 1.5;
+  text-align: center;
+  max-width: 320px;
+}
 
 .error-message {
-    background-color: #4d1a1a;
-    color: #ffb3b3;
-    border: 1px solid #803333;
-    padding: 10px 15px;
-    border-radius: 6px;
+    background-color: rgba(216, 64, 64, 0.1); /
+    color: #ff9999;
+    border: 1px solid rgba(216, 64, 64, 0.4);
+    padding: 12px 15px;
+    border-radius: 8px;
     margin-bottom: 20px;
     font-size: 0.9rem;
     text-align: center;
 }
 
+/* RegisterPage.css */
+/* ... (các style khác của bạn) ... */
 
-
-.community-item {
-  background-color: #2f2f2f; 
-  border-radius: 12px;
-  aspect-ratio: 1 / 1;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2.5rem; 
-  color: #777;       
+.form-link { /* Hoặc .signin-link nếu bạn không đổi tên class trong JSX */
+  text-align: center;
+  margin-top: 25px; 
+  font-size: 0.9rem;
+  color: var(--secondary-text-color); 
 }
 
-
-@media (max-width: 900px) {
-  .main-content {
-    flex-direction: column;
-    align-items: center;
-    gap: 50px;
-    padding: 40px 30px;
-    overflow-y: auto; 
-    justify-content: flex-start;
-  }
-  .form-container,
-  .community-container {
-     max-width: 450px;
-     width: 90%; 
-     flex: none; 
-  }
-  .community-container {
-      padding-top: 0;
-  }
-  .community-grid {
-      max-width: 300px;
-  }
+.form-link a { /* Hoặc .signin-link a */
+  color: var(--accent-color); 
+  font-weight: 600; /* Chữ đậm cho link */
+  text-decoration: none; /* Bỏ gạch chân mặc định */
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+  margin-left: 5px; /* Tạo khoảng cách nhỏ */
 }
 
-@media (max-width: 500px) {
-    .header {
-        padding: 15px 20px;
-    }
-    .logo {
-        font-size: 1.3rem;
-    }
-    .main-content {
-        padding: 30px 20px;
-    }
-    .form-container h2 {
-        font-size: 1.7rem;
-    }
-    .community-container h3 {
-        font-size: 1.4rem;
-    }
-     .form-container,
-    .community-container {
-      width: 95%; 
-    }
+.form-link a:hover { /* Hoặc .signin-link a:hover */
+  color: var(--button-primary-hover-bg); /* Sử dụng màu hover của nút chính, hoặc một màu accent sáng hơn */
+  /* Hoặc: filter: brightness(1.2); */
+  text-decoration: underline; /* Thêm gạch chân khi hover */
 }
+

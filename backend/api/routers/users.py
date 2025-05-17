@@ -8,7 +8,8 @@ from api.deps import (
     get_current_active_user,
     get_current_user,
     get_token_manager, 
-    get_user_manager
+    get_user_manager,
+    requires_role
 )
 
 
@@ -47,7 +48,7 @@ async def read_me(
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
-    user = await user_manager.get_by_id(current_user['id'])
+    user = await user_manager.get_by_id(current_user.id)
     return user
 
 
@@ -57,25 +58,46 @@ async def get_user_detail(
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
+    if user_id != current_user.id:
+        # enforce admin for any non‐self lookup
+        await requires_role("admin")(current_user)
     user = await user_manager.get_by_id(user_id)
     return user
 
+@router.get(
+    "/by-username/{username}",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+)
+async def get_user_by_username(
+    username: str,
+    user_manager: User = Depends(get_user_manager),
+    current_user: schemas.User = Depends(get_current_active_user),
+):
+    """
+    Lookup a user by their username. Requires the caller to be authenticated.
+    """
+    return await user_manager.get_by_username(username)
 
-@router.get('/all', status_code=status.HTTP_200_OK, response_model=list[schemas.UserOfAll])
+    
+@router.get(
+    '/all',
+    status_code=status.HTTP_200_OK,
+    response_model=list[schemas.UserOfAll]
+)
 async def get_all_user(
     user_manager: User = Depends(get_user_manager),
-    current_user: schemas.User = Depends(get_current_active_user)
+    current_user: schemas.User = Depends(get_current_active_user),
 ):
-    users = await user_manager.get_all_except_me(current_user['id'])
-    return users
-
+    # any authenticated user can now list all others (except themselves)
+    return await user_manager.get_all_except_me(current_user.id)
 
 @router.put('/update/info/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.User)
 async def update_user(
     user_id: str,
     updated_data: schemas.UserUpdate,
     user_manager: User = Depends(get_user_manager),
-    current_user: schemas.User = Depends(get_current_active_user)
+    _: schemas.User = Depends(requires_role("admin"))
 ):
     user = await user_manager.update_user(user_id, updated_data)
     return user
@@ -84,7 +106,7 @@ async def update_user(
 async def delete_user(
     user_id: str,
     user_manager: User = Depends(get_user_manager),
-    current_user: schemas.User = Depends(get_current_active_user)
+    _: schemas.User = Depends(requires_role("admin"))
 ):
     deleted_user = await user_manager.delete_user(user_id)
     return deleted_user

@@ -115,7 +115,7 @@ async def reset_password(
         raise HTTPException(404, "User not found")
 
     # forbid same‐as‐old
-    if verify_password(req.new_password, user["hashed_password"]):
+    if verify_password(req.new_password, user.get('password')):
         raise HTTPException(
             status_code=400,
             detail="New password must be different from your current password"

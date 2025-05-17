@@ -1,12 +1,13 @@
 
 import json
-from fastapi import Depends, WebSocket, WebSocketDisconnect
-
+from fastapi import Depends, HTTPException, WebSocket, WebSocketDisconnect
+from pydantic import ValidationError
 from api.deps import get_private_chat_manager, get_token_manager
 from serializers.chat_serializers import message_serializer
 from crud.chat import PrivateChatManager
 from services.token import TokenManager
-
+from schemas import shared
+import schemas
 connected_clients: dict[str, set] = dict()
 
 async def chat_websocket_endpoint(
@@ -22,9 +23,13 @@ async def chat_websocket_endpoint(
     print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
     
     try:
-        current_user = await token_manager.get_user_form_jwt_token(token, token_subject_key)
-        print(f"[User] username={current_user['username']} | id={current_user['id']}")
-    except Exception as e:
+       user_dict = await token_manager.get_user_form_jwt_token(token, token_subject_key)
+       current_user = schemas.User(**user_dict)          
+    except ValidationError:
+        await websocket.send_json({"error": "Invalid user data"})
+        await websocket.close()
+        return
+    except HTTPException:
         await websocket.send_json({"error": "Invalid token"})
         await websocket.close()
         return

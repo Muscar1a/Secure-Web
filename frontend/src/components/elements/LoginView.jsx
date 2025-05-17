@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { BsChatSquare, BsChatSquareText } from 'react-icons/bs';
-import { FiLock, FiEye } from 'react-icons/fi';
+import { BsChatSquare } from 'react-icons/bs';
+import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdOutlineMailOutline } from 'react-icons/md';
 import { FaUserFriends, FaRegImage, FaRegCommentDots } from "react-icons/fa";
 import { BsFillGrid3X3GapFill, BsGearFill } from "react-icons/bs";
@@ -18,17 +18,23 @@ const LoginView = ({
     setPassword,
     handleSubmit
 }) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <div className="login-page">
         <header className="header">
            <div className="logo">
              {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
-              TriSec
+              TriSec {/* Bạn có thể đổi thành Chatty nếu muốn */}
            </div>
-           <button className="settings-button">
-             {typeof IoSettingsOutline !== 'undefined' && <IoSettingsOutline className="settings-icon" />} 
-              Settings
-           </button>
+           <Link to="/settings" className="nav-item settings-button"> {/* Sử dụng class nav-item cho nhất quán nếu có và settings-button */}
+             {typeof IoSettingsOutline !== 'undefined' && <IoSettingsOutline className="settings-icon" style={{ marginRight: '5px', verticalAlign: 'middle' }} />} 
+             Settings
+           </Link>
         </header>
   
         <main className="main-content">
@@ -42,12 +48,12 @@ const LoginView = ({
               <div className="input-group">
                 <label htmlFor="login-username">Username</label> 
                 <div className="input-wrapper">
-                   {typeof MdOutlineMailOutline !== 'undefined' && <MdOutlineMailOutline className="input-icon" />} {/* Email Icon */}
+                   {typeof MdOutlineMailOutline !== 'undefined' && <MdOutlineMailOutline className="input-icon" />}
                    <input
                       id="login-username" 
                       name="username" 
                       type="text" 
-                      placeholder="Username"
+                      placeholder="Username or Email" // Có thể cho phép nhập cả email
                       value={username} 
                       onChange={(e) => setUsername(e.target.value)} 
                       required
@@ -62,14 +68,23 @@ const LoginView = ({
                     <input
                       id="login-password"
                       name="password"
-                      type="password" 
+                      type={showPassword ? 'text' : 'password'}  
                       placeholder="••••••••"
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    {typeof FiEye !== 'undefined' && <FiEye className="password-toggle" title="Show password (requires code change)" />}
+                    {showPassword ? (
+                        <FiEyeOff className="password-toggle" onClick={togglePasswordVisibility} title="Hide password" />
+                    ) : (
+                        <FiEye className="password-toggle" onClick={togglePasswordVisibility} title="Show password" />
+                    )}
                  </div>
+              </div>
+              
+              {/* THÊM LINK QUÊN MẬT KHẨU Ở ĐÂY */}
+              <div className="forgot-password-link">
+                <Link to="/forgot-password">Forgot Password?</Link>
               </div>
   
               <button type="submit" className="submit-button" disabled={loading}>
@@ -94,6 +109,7 @@ const LoginView = ({
               <div className="community-item"><BsFillGrid3X3GapFill /></div>
             </div>
             <h3>Welcome back!</h3> 
+            <p>Sign in to continue your journey with us and reconnect with your community.</p>
           </div>
   
         </main> 
