@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     // const user = JSON.parse(localStorage.getItem('user') || 'null');
-
     const verifyToken = async () => {
       if (!token) {
         setAuthState({

@@ -22,8 +22,14 @@ const ChatPage = () => {
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
+<<<<<<< HEAD
   
 
+=======
+  const previousRecipientRef = useRef(null);
+  // username lookup
+  const [lookupUsername, setLookupUsername]   = useState("");
+>>>>>>> 02b80ed12c329c83ffaf4f8362e0f6505329a2df
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -71,6 +77,32 @@ const ChatPage = () => {
       return contactUser.username[0].toUpperCase();
     }
     return "U";
+  };
+
+    const handleLookup = async () => {
+    if (!lookupUsername.trim()) return;
+    setMessages([]);
+    setIsLoadingChat(true);
+
+    try {
+      // 1) find the user by username
+      const resp = await axios.get(
+        `${host}/users/by-username/${lookupUsername.trim()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const peer = resp.data;  // { id, username, … }
+
+      // 2) re-use your existing flow
+      const chatId = await fetchOrCreateChat(peer.id);
+      if (chatId) {
+        setCurrentChatId(chatId);
+        setSelectedRecipient(peer);
+      }
+    } catch (err) {
+      console.error("Lookup failed:", err);     
+    } finally {
+      setLookupUsername("");
+    }
   };
 
   const fetchOrCreateChat = async (recipientId) => {
@@ -163,6 +195,7 @@ const ChatPage = () => {
     socket.onopen = () => {
       console.log(`WebSocket connection opened for chat ID: ${currentChatId}`);
       setIsSocketConnected(true);
+      console.log("isSocketConnected after set:", isSocketConnected);
       const loadOldMessages = async () => {
         try {
           const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
@@ -303,6 +336,36 @@ const ChatPage = () => {
             <BsPeople className="sidebar-icon" />
             <span>Contacts</span>
           </div>
+          <div className="username-lookup" style={{ padding: '0 16px 16px' }}>
+            <input
+            type="text"
+            value={lookupUsername}
+            onChange={e => setLookupUsername(e.target.value)}
+            placeholder="Enter peer’s username…"
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              marginBottom: '8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc'
+            }}
+          />
+          <button
+            onClick={handleLookup}
+            disabled={!lookupUsername.trim() || !token}
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              borderRadius: '4px',
+              backgroundColor: '#567',
+              color: '#fff',
+              border: 'none',
+              cursor: lookupUsername.trim() && token ? 'pointer' : 'not-allowed'
+            }}
+          >
+            Start Chat
+          </button> 
+          </div>
           <ul className="contact-list">{renderContactList()}</ul>
         </aside>
 
@@ -386,10 +449,17 @@ const ChatPage = () => {
                   type="text"
                   value={messageInput}
                   onChange={handleInputChange}
+<<<<<<< HEAD
                   placeholder={isLoadingChat ? "Loading..." : "Type a message..."}
                   disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId}
                 />
                 <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId || !messageInput.trim()}>
+=======
+                  placeholder={isLoadingChat ? "Loading chat..." : "Type a message..."}
+                  disabled={isLoadingChat || !isSocketConnected || !currentChatId}
+                />
+                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !currentChatId || !messageInput.trim()}>
+>>>>>>> 02b80ed12c329c83ffaf4f8362e0f6505329a2df
                   Send
                 </button>
               </form>

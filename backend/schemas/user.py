@@ -38,6 +38,7 @@ class UserRead(UserBase):
     last_name: str | None
     is_active: bool
     is_disabled: bool
+    roles: list[str] = [] 
 User = UserRead
 class UserUpdate(BaseModel):
     id: str
@@ -48,7 +49,7 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
     is_disabled: Optional[bool] = None
     password: Optional[str]   = None
-
+    roles:    Optional[list[str]] = None
 class UserInDb(UserRead):
     private_message_recipients: list[MessageRecipient | None]
     group_chat_ids: list[str | None]
