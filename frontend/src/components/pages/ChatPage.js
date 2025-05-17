@@ -22,14 +22,12 @@ const ChatPage = () => {
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
-<<<<<<< HEAD
   
 
-=======
+
   const previousRecipientRef = useRef(null);
   // username lookup
   const [lookupUsername, setLookupUsername]   = useState("");
->>>>>>> 02b80ed12c329c83ffaf4f8362e0f6505329a2df
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -449,17 +447,14 @@ const ChatPage = () => {
                   type="text"
                   value={messageInput}
                   onChange={handleInputChange}
-<<<<<<< HEAD
                   placeholder={isLoadingChat ? "Loading..." : "Type a message..."}
                   disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId}
                 />
-                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId || !messageInput.trim()}>
-=======
+                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId || !messageInput.trim()}
                   placeholder={isLoadingChat ? "Loading chat..." : "Type a message..."}
                   disabled={isLoadingChat || !isSocketConnected || !currentChatId}
                 />
                 <button type="submit" disabled={isLoadingChat || !isSocketConnected || !currentChatId || !messageInput.trim()}>
->>>>>>> 02b80ed12c329c83ffaf4f8362e0f6505329a2df
                   Send
                 </button>
               </form>
