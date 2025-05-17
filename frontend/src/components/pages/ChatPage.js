@@ -1,17 +1,16 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/AuthContext';
-// import { useNavigate } from 'react-router-dom';
 import './ChatPage.css';
 import { host, ws_host } from '../../utils/APIRoutes';
 import { BsChatSquare, BsPeople, BsChatDots } from 'react-icons/bs';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { CgProfile } from 'react-icons/cg';
 import { BiLogOut } from 'react-icons/bi';
+import { Link } from 'react-router-dom'; // Import Link
 
 const ChatPage = () => {
   const { user, token, logout, loading: authLoading } = useContext(AuthContext);
-  // const navigate = useNavigate();
 
   const [contacts, setContacts] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
@@ -19,11 +18,11 @@ const ChatPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [isSocketConnected, setIsSocketConnected] = useState();
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const previousRecipientRef = useRef(null);
+  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,36 +51,26 @@ const ChatPage = () => {
     fetchContacts();
   }, [token, user]);
 
-  const handleSelectContact = async (contact) => {
-    if (selectedRecipient?.id === contact.id && !isLoadingChat) return;
-
-    console.log(`Switching chat to: ${contact.username || contact.id}`); // Log username or ID
-    setIsLoadingChat(true);
-    previousRecipientRef.current = selectedRecipient;
-    setSelectedRecipient(contact);
-
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      console.log("Closing existing WebSocket connection.");
-      socketRef.current.close();
-      socketRef.current = null;
-      setIsSocketConnected(false);
+  const getDisplayName = (contact) => {
+    if (!contact) return "Unknown User";
+    if (contact.first_name && contact.last_name) {
+      return `${contact.first_name} ${contact.last_name}`;
     }
-    setCurrentChatId(null);
-
-    try {
-      const chatId = await fetchOrCreateChat(contact.id);
-      if (chatId) {
-        setCurrentChatId(chatId);
-      } else {
-        console.error("Failed to fetch or create chat ID for recipient:", contact.id);
-        setSelectedRecipient(previousRecipientRef.current);
-        setIsLoadingChat(false);
-      }
-    } catch (error) {
-      console.error("Error in handleSelectContact during fetchOrCreateChat:", error);
-      setSelectedRecipient(previousRecipientRef.current);
-      setIsLoadingChat(false);
+    if (contact.username) {
+      return contact.username;
     }
+    return `User ${contact.id}`; 
+  };
+
+  const getAvatarInitials = (contactUser) => { 
+    if (!contactUser) return "U";
+    if (contactUser.first_name && contactUser.last_name) {
+      return `${contactUser.first_name[0]}${contactUser.last_name[0]}`.toUpperCase();
+    }
+    if (contactUser.username) {
+      return contactUser.username[0].toUpperCase();
+    }
+    return "U";
   };
 
   const fetchOrCreateChat = async (recipientId) => {
@@ -90,61 +79,101 @@ const ChatPage = () => {
       const response = await axios.get(`${host}/chat/private/recipient/chat-id/${recipientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Fetched existing chat ID:", response.data.chat_id);
       return response.data.chat_id;
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        console.log("Chat not found, creating new chat.");
+        console.log("Chat not found, creating new chat via GET (as per original).");
         const createResponse = await axios.get(`${host}/chat/private/recipient/create-chat/${recipientId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Chat created:", createResponse.data);
+        console.log("Chat created (via GET):", createResponse.data);
         return createResponse.data.chat_id;
       } else {
-        console.error("Error fetching/creating chat:", error);
-        return null;
+        console.error("Error fetching/creating chat:", error.response?.data || error.message, error);
+        throw error; 
       }
     }
   };
 
+  const handleSelectContact = async (contact) => {
+    if (selectedRecipient?.id === contact.id && !isLoadingChat) return;
+
+    console.log(`Switching chat to: ${getDisplayName(contact)} (ID: ${contact.id})`);
+    setIsLoadingChat(true);
+    setSelectedRecipient(contact);
+    setMessages([]); 
+    
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.close();
+    }
+    socketRef.current = null;
+    setIsSocketConnected(false);
+    setCurrentChatId(null);
+
+    try {
+      const chatId = await fetchOrCreateChat(contact.id);
+      if (chatId) {
+        setCurrentChatId(chatId);
+      } else {
+        console.error("fetchOrCreateChat returned null/undefined chatId without throwing error.");
+        setSelectedRecipient(null);
+        setIsLoadingChat(false);
+      }
+    } catch (error) {
+      console.error("Failed to setup chat in handleSelectContact:", error);
+      setSelectedRecipient(null);
+      setIsLoadingChat(false);
+    }
+  };
+
   useEffect(() => {
-    if (!currentChatId || !selectedRecipient || !token) {
+    if (!currentChatId || !selectedRecipient || !token || !user) {
       if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         socketRef.current.close();
       }
       socketRef.current = null;
       setIsSocketConnected(false);
-      if (!selectedRecipient) setIsLoadingChat(false);
+      if (!selectedRecipient) {
+          setIsLoadingChat(false);
+      }
       return;
     }
+    
+    if(!isLoadingChat) setIsLoadingChat(true); 
 
-    console.log("Attempting to connect WebSocket for chat ID:", currentChatId);
-    const wsToken = localStorage.getItem('token');
-    if (!wsToken) {
-      console.error("WebSocket token not found.");
+    const wsTokenFromStorage = localStorage.getItem('token');
+    if (!wsTokenFromStorage) {
+      console.error("WebSocket token not found in localStorage.");
       setIsLoadingChat(false);
       setIsSocketConnected(false);
+      setSelectedRecipient(null); 
       return;
     }
 
-    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${wsToken}`);
+    if (socketRef.current && socketRef.current.readyState !== WebSocket.CLOSED) {
+        socketRef.current.close();
+    }
+
+    console.log(`Attempting to connect WebSocket for chat ID: ${currentChatId}`);
+    const encodedToken = encodeURIComponent(wsTokenFromStorage);
+    const socket = new WebSocket(`${ws_host}/ws/chat/private/${currentChatId}?token=${encodedToken}`);
     socketRef.current = socket;
 
     socket.onopen = () => {
-      console.log("WebSocket connection opened for chat ID:", currentChatId);
+      console.log(`WebSocket connection opened for chat ID: ${currentChatId}`);
       setIsSocketConnected(true);
       const loadOldMessages = async () => {
         try {
-          console.log("Fetching messages for new chat ID:", currentChatId);
           const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}` }, 
           });
-          console.log("New messages fetched:", response.data);
           setMessages(response.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
         } catch (error) {
-          console.error("No messages found or error fetching for new chat:", error);
+          console.error("Error fetching old messages:", error);
           setMessages([]);
         } finally {
-          setIsLoadingChat(false);
+          setIsLoadingChat(false); 
         }
       };
       loadOldMessages();
@@ -153,34 +182,38 @@ const ChatPage = () => {
     socket.onmessage = (event) => {
       try {
         const newMessageData = JSON.parse(event.data);
-        console.log("New message received via WebSocket:", newMessageData);
         if (socketRef.current && socketRef.current.url.includes(currentChatId)) {
-          setMessages((prevMessages) => [...prevMessages, newMessageData]);
+            setMessages((prevMessages) => [...prevMessages, newMessageData]);
         }
       } catch (e) {
-        console.error("Error parsing WebSocket message or updating state:", e, "Raw data:", event.data);
+        console.error("Error parsing WebSocket message:", e);
       }
     };
 
     socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
+      console.error(`WebSocket error for chat ID ${currentChatId}:`, error);
       setIsLoadingChat(false);
       setIsSocketConnected(false);
     };
 
     socket.onclose = (event) => {
-      console.log("WebSocket connection closed:", event.reason, event.code, "for chat ID:", currentChatId);
+      console.log(`WebSocket connection closed for chat ID ${currentChatId}:`, event.reason, event.code);
       setIsSocketConnected(false);
     };
 
     return () => {
-      if (socketRef.current && socketRef.current.url.includes(currentChatId)) {
-        console.log("Closing WebSocket connection from useEffect cleanup for chat ID:", currentChatId);
-        socketRef.current.close();
+      if (socketRef.current) {
+        socketRef.current.onopen = null;
+        socketRef.current.onmessage = null;
+        socketRef.current.onerror = null;
+        socketRef.current.onclose = null;
+        if (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING) {
+            socketRef.current.close();
+        }
         socketRef.current = null;
       }
     };
-  }, [currentChatId, token]);
+  }, [currentChatId, token, user, selectedRecipient]); 
 
   const handleInputChange = (e) => {
     setMessageInput(e.target.value);
@@ -188,11 +221,11 @@ const ChatPage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (messageInput.trim() === '' || !socketRef.current || !isSocketConnected || !selectedRecipient || isLoadingChat) {
+    if (messageInput.trim() === '' || !socketRef.current || !isSocketConnected || !selectedRecipient || isLoadingChat || !currentChatId) {
       return;
     }
-    const messageContent = messageInput;
-    socketRef.current.send(JSON.stringify(messageContent));
+    const messagePayload = messageInput; 
+    socketRef.current.send(JSON.stringify(messagePayload));
     setMessageInput('');
   };
 
@@ -206,21 +239,9 @@ const ChatPage = () => {
     }
   };
 
-  // Function to get display name
-  const getDisplayName = (contact) => {
-    if (!contact) return "Unknown User";
-    if (contact.first_name && contact.last_name) {
-      return `${contact.first_name} ${contact.last_name}`;
-    }
-    if (contact.username) {
-      return contact.username;
-    }
-    return `User ${contact.id}`; 
-  };
-
   const renderContactList = () => {
     if (authLoading && !user) {
-      return <p className="sidebar-message">Loading contacts</p>;
+      return <p className="sidebar-message">Loading contacts...</p>;
     }
     if (!Array.isArray(contacts) || contacts.length === 0) {
       return <p className="sidebar-message">No contacts available.</p>;
@@ -228,8 +249,6 @@ const ChatPage = () => {
 
     return contacts.map((contact) => {
       const isActive = selectedRecipient?.id === contact.id;
-      const initials = `${contact.first_name ? contact.first_name[0] : ''}${contact.last_name ? contact.last_name[0] : ''}`.toUpperCase() || (contact.username ? contact.username[0].toUpperCase() : 'U');
-
       return (
         <li
           key={contact.id}
@@ -238,40 +257,40 @@ const ChatPage = () => {
         >
           <div className="contact-avatar">
             {contact.avatar_url ? (
-              <img src={contact.avatar_url} alt="avatar" />
+              <img src={contact.avatar_url} alt={getDisplayName(contact)} />
             ) : (
-              <span className="avatar-initials">{initials}</span>
+              <span className="avatar-initials">{getAvatarInitials(contact)}</span>
             )}
           </div>
           <div className="contact-info">
             <span className="contact-name">{getDisplayName(contact)}</span>
-            <span className="contact-status">Offline</span>
+
           </div>
         </li>
       );
     });
   };
 
-  if (authLoading && !user) {
+  if (authLoading || !user) {
     return <div className="loading-screen">Loading...</div>;
   }
-
+  
   const recipientForHeader = selectedRecipient;
 
   return (
     <div className="chat-page">
       <header className="chat-header">
-           <div className="logo">
-             {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
+           <div className="logo"> 
+             <BsChatSquare className="logo-icon" /> 
               TriSec
            </div>        
            <nav className="header-nav">
-          <a href="/settings" className="nav-item">
+          <Link to="/settings" className="nav-item"> 
             <IoSettingsOutline style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Settings
-          </a>
-          <a href="/profile" className="nav-item">
+          </Link>
+          <Link to="/profile" className="nav-item"> 
             <CgProfile style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Profile
-          </a>
+          </Link>
           <button onClick={logout} className="nav-item nav-item-logout">
             <BiLogOut style={{ marginRight: '5px', verticalAlign: 'middle' }} /> Logout
           </button>
@@ -288,54 +307,46 @@ const ChatPage = () => {
         </aside>
 
         <section className="chat-area">
-          {!recipientForHeader ? (
-            <div className="welcome-chat-prompt">
-              <div className="welcome-chat-icon-container">
-                <BsChatDots className="welcome-chat-icon" />
-              </div>
-              <h2 className="welcome-chat-title">Welcome to TriSec!</h2>
-              <p className="welcome-chat-subtitle">
-                Select a conversation from the sidebar to start chatting
-              </p>
-            </div>
+          {!recipientForHeader || !currentChatId ? (
+             isLoadingChat && recipientForHeader ? (
+                <div className="chat-loading-messages"><p>Setting up chat with {getDisplayName(recipientForHeader)}...</p></div>
+            ) : (
+                <div className="welcome-chat-prompt">
+                  <div className="welcome-chat-icon-container">
+                    <BsChatDots className="welcome-chat-icon" />
+                  </div>
+                  <h2 className="welcome-chat-title">Welcome to Chatty!</h2>
+                  <p className="welcome-chat-subtitle">
+                    Select a conversation from the sidebar to start chatting
+                  </p>
+                </div>
+            )
           ) : (
-            <div className={`chat-window ${isLoadingChat ? 'chat-loading-new-conversation' : ''}`}>
+            <div className={`chat-window`}>
               <div className="chat-window-header">
                 <div className="chat-recipient-avatar">
                   {recipientForHeader.avatar_url ? (
                     <img src={recipientForHeader.avatar_url} alt="recipient avatar" />
                   ) : (
-                    <span className="avatar-initials">
-                      {/* MODIFIED: Consistent initials logic */}
-                      {`${recipientForHeader.first_name ? recipientForHeader.first_name[0] : ''}${recipientForHeader.last_name ? recipientForHeader.last_name[0] : ''}`.toUpperCase() || (recipientForHeader.username ? recipientForHeader.username[0].toUpperCase() : 'U')}
-                    </span>
+                    <span className="avatar-initials">{getAvatarInitials(recipientForHeader)}</span>
                   )}
                 </div>
                 <div className="chat-recipient-info">
-                  {/* MODIFIED: Use getDisplayName */}
                   <span className="chat-recipient-name">
                     {getDisplayName(recipientForHeader)}
-                  </span>
-                  <span className="chat-recipient-status">
-                    {isLoadingChat ? "Connecting..." : (isSocketConnected ? "Online" : "Offline")}
                   </span>
                 </div>
               </div>
 
               <div className="chat-messages-container">
-                {messages.length > 0 ? (
+                {isLoadingChat && messages.length === 0 ? (
+                    <div className="chat-loading-messages"><p>Loading messages...</p></div>
+                ) : messages.length > 0 ? (
                   messages.map((msg) => {
                     if (!user || !recipientForHeader) return null;
                     const isSent = msg.created_by === user.id;
                     const messageSender = isSent ? user : recipientForHeader;
-                    const senderDisplayName = getDisplayName(messageSender); // Get display name for avatar initials if needed
                     
-                    // Use first letter of display name for initials if full name isn't available for initials
-                    const avatarInitials = (
-                        (messageSender.first_name ? messageSender.first_name[0] : '') +
-                        (messageSender.last_name ? messageSender.last_name[0] : '')
-                    ).toUpperCase() || (senderDisplayName ? senderDisplayName[0].toUpperCase() : 'U');
-
                     const isExplodingHeadEmoji = msg.message === '🤯';
 
                     return (
@@ -345,7 +356,7 @@ const ChatPage = () => {
                       >
                         {!isSent && (
                            <div className="chat-message-avatar">
-                             {recipientForHeader.avatar_url ? <img src={recipientForHeader.avatar_url} alt={getDisplayName(recipientForHeader)}/> : <span className="avatar-initials">{avatarInitials}</span>}
+                             {messageSender.avatar_url ? <img src={messageSender.avatar_url} alt={getDisplayName(messageSender)}/> : <span className="avatar-initials">{getAvatarInitials(messageSender)}</span>}
                            </div>
                         )}
                         <div className={`message-bubble ${isExplodingHeadEmoji ? 'message-emoji-large' : ''}`}>
@@ -358,17 +369,14 @@ const ChatPage = () => {
                         </div>
                         {isSent && (
                           <div className="chat-message-avatar">
-                            {user.avatar_url ? <img src={user.avatar_url} alt={getDisplayName(user)}/> : <span className="avatar-initials">{avatarInitials}</span>}
+                            {messageSender.avatar_url ? <img src={messageSender.avatar_url} alt={getDisplayName(messageSender)}/> : <span className="avatar-initials">{getAvatarInitials(messageSender)}</span>}
                           </div>
                         )}
                       </div>
                     );
                   })
                 ) : (
-                  !isLoadingChat && <p className="no-messages">No messages yet. Say hello!</p>
-                )}
-                {isLoadingChat && messages.length > 0 && (
-                    <div className="chat-loading-overlay"><p></p></div>
+                  <p className="no-messages">No messages yet. Say hello!</p>
                 )}
                 <div ref={messagesEndRef} />
               </div>
@@ -378,10 +386,10 @@ const ChatPage = () => {
                   type="text"
                   value={messageInput}
                   onChange={handleInputChange}
-                  placeholder={isLoadingChat ? "Loading chat..." : "Type a message..."}
-                  disabled={isLoadingChat || !isSocketConnected || !selectedRecipient}
+                  placeholder={isLoadingChat ? "Loading..." : "Type a message..."}
+                  disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId}
                 />
-                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !messageInput.trim()}>
+                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId || !messageInput.trim()}>
                   Send
                 </button>
               </form>

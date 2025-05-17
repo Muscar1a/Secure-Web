@@ -45,7 +45,6 @@ const ProfilePage = () => {
         <button onClick={goBack} className="profile-back-button">
           <IoArrowBack /> Back
         </button>
-        <h1 className="profile-app-title">Chatty</h1>
       </div>
 
       <div className="profile-card">
