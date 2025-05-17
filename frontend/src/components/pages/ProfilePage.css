@@ -1,5 +1,3 @@
-/* ProfilePage.css */
-
 .profile-page-container {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -47,18 +45,18 @@
 }
 
 .profile-card {
-    background-color: var(--profile-card-bg, var(--sidebar-bg-color)); /* Biến riêng hoặc fallback */
+    background-color: var(--profile-card-bg, var(--sidebar-bg-color));
     padding: 30px 40px;
     border-radius: 12px;
     width: 100%;
-    max-width: 650px; /* Rộng hơn một chút */
-    margin: 30px auto; /* Căn giữa và có khoảng cách với header */
+    max-width: 600px;
+    margin: 30px auto;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     border: 1px solid var(--divider-color);
     text-align: center;
 }
 
-.profile-title-main { /* "Profile" */
+.profile-title-main {
     font-size: 2rem;
     font-weight: 600;
     color: var(--text-color);
@@ -71,27 +69,8 @@
     margin-bottom: 35px;
 }
 
-.profile-message {
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    font-size: 0.9rem;
-    text-align: center;
-}
-.profile-message.error {
-    background-color: var(--error-bg, rgba(216, 64, 64, 0.1));
-    color: var(--error-text, #ff9999);
-    border: 1px solid var(--error-border, rgba(216, 64, 64, 0.4));
-}
-.profile-message.success {
-    background-color: var(--success-bg, rgba(76, 175, 80, 0.1));
-    color: var(--success-text, #a5d6a7);
-    border: 1px solid var(--success-border, rgba(76, 175, 80, 0.4));
-}
-
-
 .profile-avatar-section {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -99,9 +78,11 @@
 
 .profile-avatar-wrapper {
     position: relative;
-    width: 130px; /* Avatar lớn hơn */
+    width: 130px;
     height: 130px;
-    margin-bottom: 10px;
+}
+.profile-avatar-wrapper.view-only {
+    cursor: default;
 }
 
 .profile-avatar-img {
@@ -109,57 +90,9 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--accent-color); /* Viền avatar màu accent */
-    background-color: var(--avatar-bg-color); /* Nền cho fallback */
+    border: 4px solid var(--accent-color);
+    background-color: var(--avatar-bg-color);
 }
-
-.profile-avatar-edit-button {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background-color: var(--input-bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--divider-color);
-    border-radius: 50%;
-    width: 36px; /* Nút camera lớn hơn */
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.profile-avatar-edit-button:hover { background-color: var(--contact-item-hover-bg); }
-.profile-avatar-edit-button:active { transform: scale(0.95); }
-.profile-avatar-edit-button svg { font-size: 1.1rem; }
-
-.profile-avatar-caption {
-    font-size: 0.85rem;
-    color: var(--secondary-text-color);
-    margin-bottom: 15px;
-}
-
-.profile-action-button { /* Dùng cho Save Photo, Save Description */
-    background-color: var(--button-primary-bg);
-    color: var(--button-primary-text);
-    border: none;
-    padding: 10px 22px;
-    border-radius: 6px;
-    font-size: 0.95em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.profile-action-button:hover:not(:disabled) { background-color: var(--button-primary-hover-bg); }
-.profile-action-button:active:not(:disabled) { transform: scale(0.98); }
-.profile-action-button:disabled { opacity: 0.7; cursor: not-allowed; }
-
-.profile-action-button.save-avatar { margin-top: 10px; }
-.profile-action-button.save-description { margin-left: auto; /* Đẩy nút Save của description sang phải */}
 
 .profile-info-group {
     margin-bottom: 25px;
@@ -168,7 +101,7 @@
 
 .profile-info-group label {
     display: block;
-    font-size: 0.9rem; /* Label to hơn chút */
+    font-size: 0.9rem;
     color: var(--secondary-text-color);
     margin-bottom: 8px;
     font-weight: 500;
@@ -177,87 +110,28 @@
 }
 .profile-info-icon { margin-right: 10px; font-size: 1em; color: var(--accent-color); }
 
-.profile-info-group input[type="text"],
-.profile-info-group textarea {
+.profile-info-group input[type="text"] {
     width: 100%;
     padding: 12px 15px;
-    background-color: var(--input-readonly-bg, var(--input-bg-color)); /* Biến riêng hoặc fallback */
+    background-color: var(--input-readonly-bg, var(--input-bg-color));
     border: 1px solid var(--input-border-color);
     border-radius: 8px;
     color: var(--text-color);
-    font-size: 1rem; /* Chữ trong input to hơn */
+    font-size: 1rem;
     box-sizing: border-box;
     font-family: inherit;
-}
-.profile-info-group input[type="text"]:read-only {
     cursor: default;
     opacity: 0.85;
 }
-.profile-info-group textarea {
-    resize: vertical; /* Cho phép thay đổi chiều cao textarea */
-    min-height: 80px;
-    background-color: var(--textarea-bg-color, var(--input-bg-color));
-    border-color: var(--textarea-border-color, var(--input-border-color));
-    color: var(--textarea-text-color, var(--text-color));
-}
-.profile-info-group textarea:focus {
-    outline: none;
-    border-color: var(--input-focus-border-color);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow-color);
-}
-
-
-.description-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px; /* Giống label thường */
-}
-.description-header label {
-    margin-bottom: 0; /* Bỏ margin bottom của label trong header này */
-}
-
-.edit-description-button, .cancel-edit-button {
-    background: none;
-    border: 1px solid var(--divider-color);
-    color: var(--secondary-text-color);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85em;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-}
-.edit-description-button:hover, .cancel-edit-button:hover {
-    background-color: var(--contact-item-hover-bg);
-    color: var(--text-color);
-}
-.cancel-edit-button {
-    margin-top: 10px; /* Khoảng cách với textarea */
-}
-
-
-.description-text {
-    background-color: var(--input-readonly-bg, var(--input-bg-color));
-    padding: 12px 15px;
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    min-height: 80px; /* Giữ chiều cao giống textarea */
-    white-space: pre-wrap; /* Giữ lại các xuống dòng */
-    word-break: break-word;
-    text-align: left;
-    border: 1px solid transparent; /* Để giữ layout giống input */
-}
-
 
 .profile-account-info-section {
-    margin-top: 35px;
+    margin-top: 30px;
     text-align: left;
     border-top: 1px solid var(--divider-color);
     padding-top: 25px;
 }
 
-.profile-section-title { /* "Account Details" */
+.profile-section-title {
     font-size: 1.2rem;
     font-weight: 500;
     color: var(--text-color);
@@ -271,13 +145,13 @@
     font-size: 0.95rem;
     color: var(--secondary-text-color);
     margin-bottom: 12px;
-    padding: 10px 0; /* Tăng padding */
+    padding: 10px 0;
 }
 .profile-account-info-item span:first-child { display: flex; align-items: center; }
 .profile-account-info-item span:last-child { color: var(--text-color); font-weight: 500; }
 
 .profile-loading {
     display: flex; justify-content: center; align-items: center;
-    height: calc(100vh - 60px); /* Trừ chiều cao header */
+    height: calc(100vh - 60px); 
     font-size: 1.2em; color: var(--text-color);
 }
