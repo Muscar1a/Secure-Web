@@ -3,12 +3,14 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 
 from core.config import settings
-
+import os
 logger = logging.getLogger(__name__)
 
-MONGODB_URL = settings.MONGODB_URL
-
-_client = AsyncIOMotorClient(MONGODB_URL)
+_client =   AsyncIOMotorClient(
+    settings.MONGODB_URL,
+    tls=True,
+    # tlsAllowInvalidCertificates=True  # only for quick local dev
+)
 mongodb = _client[settings.MONGODB_DB_NAME]
 
 async def get_db():
