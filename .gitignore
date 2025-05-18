@@ -37,3 +37,6 @@ venv/
 # SSL/TSL certificates
 *.pem
 
+# SonarQube token
+sonar-project.properties
+

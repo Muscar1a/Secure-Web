@@ -67,10 +67,10 @@ const SettingsPage = () => {
             const theme = themeList[themeKey];
             return (
               <div
-                key={themeKey}
-                className={`theme-option ${selectedPreviewTheme === themeKey ? 'preview-active' : ''} ${currentTheme === themeKey ? 'currently-applied' : ''}`}
-                onClick={() => handleThemePreview(themeKey)}
-                title={theme.name}
+              key={themeKey}
+              className={`theme-option ${selectedPreviewTheme === themeKey ? 'preview-active' : ''} ${currentTheme === themeKey ? 'currently-applied' : ''}`}
+              onClick={() => handleThemePreview(themeKey)} 
+              title={theme.name}
               >
                 <div className="theme-preview-colors">
                   {theme.previewColors.map((color, index) => (

@@ -37,7 +37,6 @@ const ChatPage = () => {
   
 
 
-  const previousRecipientRef = useRef(null);
   // username lookup
   const [lookupUsername, setLookupUsername]   = useState("");
   useEffect(() => {

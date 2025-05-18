@@ -2,5 +2,5 @@ projectKey=my-secure-chat-app-backend
 serverUrl=http://localhost:9000
 serverVersion=25.5.0.107428
 dashboardUrl=http://localhost:9000/dashboard?id=my-secure-chat-app-backend
-ceTaskId=5bebdd74-2f70-4489-9207-f93311a975f4
-ceTaskUrl=http://localhost:9000/api/ce/task?id=5bebdd74-2f70-4489-9207-f93311a975f4
+ceTaskId=ed1f9fa1-9090-46dd-8eda-c077cddf990f
+ceTaskUrl=http://localhost:9000/api/ce/task?id=ed1f9fa1-9090-46dd-8eda-c077cddf990f
