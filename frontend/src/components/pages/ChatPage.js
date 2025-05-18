@@ -7,7 +7,12 @@ import { BsChatSquare, BsPeople, BsChatDots } from 'react-icons/bs';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { CgProfile } from 'react-icons/cg';
 import { BiLogOut } from 'react-icons/bi';
-import { Link } from 'react-router-dom'; // Import Link
+import { generateAESKeyAndIV, encryptMessageWithAES, encryptAESKeyWithRSA } from '../../utils/Encryption';
+import { decryptPrivateKey, decryptAESKeyWithPrivateKey, decryptMessageWithAES } from '../../utils/Decryption';
+import { Link } from 'react-router-dom';
+import forge from 'node-forge';
+
+
 
 const ChatPage = () => {
   const { user, token, logout, loading: authLoading } = useContext(AuthContext);
@@ -20,12 +25,18 @@ const ChatPage = () => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState();
 
+  // ========== For E2EE purpose ==========
+  const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(true);
+  const [EE2EInput, setEE2EInput] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  // ========== For E2EE purpose ==========
+
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   
 
 
-  const previousRecipientRef = useRef(null);
   // username lookup
   const [lookupUsername, setLookupUsername]   = useState("");
   useEffect(() => {
@@ -54,17 +65,6 @@ const ChatPage = () => {
     };
     fetchContacts();
   }, [token, user]);
-
-  const getDisplayName = (contact) => {
-    if (!contact) return "Unknown User";
-    if (contact.first_name && contact.last_name) {
-      return `${contact.first_name} ${contact.last_name}`;
-    }
-    if (contact.username) {
-      return contact.username;
-    }
-    return `User ${contact.id}`; 
-  };
 
   const getAvatarInitials = (contactUser) => { 
     if (!contactUser) return "U";
@@ -208,7 +208,36 @@ const fetchOrCreateChat = async (recipientId) => {
           const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
             headers: { Authorization: `Bearer ${token}` }, 
           });
-          setMessages(response.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+          // console.log("New messages fetched:", response.data);
+          // setMessages(response.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+          // console.log("[-] response.data:", response);
+          const myEncryptedPrivateKeyPem = user.private_key_pem;
+          const myPublicKeyPem = user.public_key_pem;
+          const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
+
+          const decryptedMessages = await Promise.all(
+            response.data.map(async (msg) => {
+              try {
+                const encryptedKey = msg.created_by === user.id
+                  ? msg.encrypted_key_sender
+                  : msg.encrypted_key_receiver;
+
+                const aesKey = decryptAESKeyWithPrivateKey(encryptedKey, myPrivateKeyPem);
+                const plaintext = decryptMessageWithAES(msg.message, aesKey, msg.iv);
+
+                // console.log("Decrypted message:", plaintext);
+                return {
+                  ...msg,
+                  message: plaintext,
+                };
+              } catch (error) {
+                console.error("Error decrypting message:", error);
+                return msg; // Return the original message if decryption fails
+              };
+            })
+          )
+          const sortedMessages = decryptedMessages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          setMessages(sortedMessages);
         } catch (error) {
           console.error("Error fetching old messages:", error);
           setMessages([]);
@@ -220,13 +249,31 @@ const fetchOrCreateChat = async (recipientId) => {
     };
 
     socket.onmessage = (event) => {
+      const myEncryptedPrivateKeyPem = user.private_key_pem;
+      const myPublicKeyPem = user.public_key_pem;
+      const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
+
+      const data = JSON.parse(event.data);
+
       try {
-        const newMessageData = JSON.parse(event.data);
+        const encryptedAESKey = (data.created_by === user.id)
+          ? data.encrypted_key_sender
+          : data.encrypted_key_receiver;
+
+        const aesKey = decryptAESKeyWithPrivateKey(encryptedAESKey, myPrivateKeyPem);
+        // console.log("Decrypted AES key:", aesKey);
+        const plaintext = decryptMessageWithAES(data.message, aesKey, data.iv);
+        // console.log("Decrypted message:", plaintext);
         if (socketRef.current && socketRef.current.url.includes(currentChatId)) {
-            setMessages((prevMessages) => [...prevMessages, newMessageData]);
+          setMessages((prevMessages) => [...prevMessages, {
+            ...data,
+            message: plaintext,
+            created_at: new Date(data.created_at).toISOString(),
+          }]);
         }
-      } catch (e) {
-        console.error("Error parsing WebSocket message:", e);
+      }
+      catch (error) {
+        console.error("Error parsing message data:", error);
       }
     };
 
@@ -255,6 +302,15 @@ const fetchOrCreateChat = async (recipientId) => {
     };
   }, [currentChatId, token, user, selectedRecipient]); 
 
+
+  // ========== For E2EE purpose ==========
+  const verifyPassword = () => {
+    setIsPasswordVerified(true);
+    setShowPasswordModal(false);
+    setPasswordError("");
+  };
+  // ========== For E2EE purpose ==========
+
   const handleInputChange = (e) => {
     setMessageInput(e.target.value);
   };
@@ -264,9 +320,44 @@ const fetchOrCreateChat = async (recipientId) => {
     if (messageInput.trim() === '' || !socketRef.current || !isSocketConnected || !selectedRecipient || isLoadingChat || !currentChatId) {
       return;
     }
-    const messagePayload = messageInput; 
-    socketRef.current.send(JSON.stringify(messagePayload));
-    setMessageInput('');
+    // const messageContent = messageInput;
+    try {
+      const messageContent = messageInput;
+
+      const { key: aesKey, iv } = generateAESKeyAndIV();
+
+      const receiverPublicKeyPem = selectedRecipient.public_key_pem;
+
+      const myPublicKeyPem = user.public_key_pem;
+      const myEncryptedPrivateKeyPem = user.private_key_pem;
+      const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
+      // console.log("myPrivateKeyPem", myPrivateKeyPem);
+
+      if (!receiverPublicKeyPem || !myPrivateKeyPem || !myPublicKeyPem) {
+        console.error("Missing keys");
+        return;
+      }
+      // Encrypt with AES
+      const cipherText = encryptMessageWithAES(messageContent, aesKey, iv);
+      // Encrypt AES with RSA
+      const encryptedKeyForReceiver = encryptAESKeyWithRSA(aesKey, receiverPublicKeyPem);
+      const encryptedKeyForSender = encryptAESKeyWithRSA(aesKey, myPublicKeyPem);
+
+      const messagePayload = {
+        message: cipherText,
+        encrypted_key_sender: encryptedKeyForSender,
+        encrypted_key_receiver: encryptedKeyForReceiver,
+        iv: forge.util.bytesToHex(iv),
+        created_by: user.id,
+        id: currentChatId,
+      }
+
+
+      socketRef.current.send(JSON.stringify(messagePayload));
+      setMessageInput('');
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   const formatTimestamp = (timestamp) => {
@@ -277,6 +368,18 @@ const fetchOrCreateChat = async (recipientId) => {
     } catch (e) {
       return "Invalid time";
     }
+  };
+
+  // Function to get display name
+  const getDisplayName = (contact) => {
+    if (!contact) return "Unknown User";
+    if (contact.first_name && contact.last_name) {
+      return `${contact.first_name} ${contact.last_name}`;
+    }
+    if (contact.username) {
+      return contact.username;
+    }
+    return `User ${contact.id}`;
   };
 
   const renderContactList = () => {
@@ -316,6 +419,9 @@ const fetchOrCreateChat = async (recipientId) => {
   }
   
   const recipientForHeader = selectedRecipient;
+
+
+
 
   return (
     <div className="chat-page">
@@ -376,100 +482,150 @@ const fetchOrCreateChat = async (recipientId) => {
           <ul className="contact-list">{renderContactList()}</ul>
         </aside>
 
-        <section className="chat-area">
-          {!recipientForHeader || !currentChatId ? (
-             isLoadingChat && recipientForHeader ? (
-                <div className="chat-loading-messages"><p>Setting up chat with {getDisplayName(recipientForHeader)}...</p></div>
-            ) : (
-                <div className="welcome-chat-prompt">
-                  <div className="welcome-chat-icon-container">
-                    <BsChatDots className="welcome-chat-icon" />
-                  </div>
-                  <h2 className="welcome-chat-title">Welcome to Chatty!</h2>
-                  <p className="welcome-chat-subtitle">
-                    Select a conversation from the sidebar to start chatting
-                  </p>
-                </div>
-            )
-          ) : (
-            <div className={`chat-window`}>
-              <div className="chat-window-header">
-                <div className="chat-recipient-avatar">
-                  {recipientForHeader.avatar_url ? (
-                    <img src={recipientForHeader.avatar_url} alt="recipient avatar" />
-                  ) : (
-                    <span className="avatar-initials">{getAvatarInitials(recipientForHeader)}</span>
-                  )}
-                </div>
-                <div className="chat-recipient-info">
-                  <span className="chat-recipient-name">
-                    {getDisplayName(recipientForHeader)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="chat-messages-container">
-                {isLoadingChat && messages.length === 0 ? (
-                    <div className="chat-loading-messages"><p>Loading messages...</p></div>
-                ) : messages.length > 0 ? (
-                  messages.map((msg) => {
-                    if (!user || !recipientForHeader) return null;
-                    const isSent = msg.created_by === user.id;
-                    const messageSender = isSent ? user : recipientForHeader;
-                    
-                    const isExplodingHeadEmoji = msg.message === '🤯';
-
-                    return (
-                      <div
-                        key={msg.id || msg.temp_id || Math.random()}
-                        className={`message-row ${isSent ? "sent" : "received"}`}
-                      >
-                        {!isSent && (
-                           <div className="chat-message-avatar">
-                             {messageSender.avatar_url ? <img src={messageSender.avatar_url} alt={getDisplayName(messageSender)}/> : <span className="avatar-initials">{getAvatarInitials(messageSender)}</span>}
-                           </div>
-                        )}
-                        <div className={`message-bubble ${isExplodingHeadEmoji ? 'message-emoji-large' : ''}`}>
-                          {isExplodingHeadEmoji ? (
-                            <span className="emoji-large">🤯</span>
-                          ) : (
-                            <p>{msg.message}</p>
-                          )}
-                          <span className="message-timestamp">{formatTimestamp(msg.created_at)}</span>
-                        </div>
-                        {isSent && (
-                          <div className="chat-message-avatar">
-                            {messageSender.avatar_url ? <img src={messageSender.avatar_url} alt={getDisplayName(messageSender)}/> : <span className="avatar-initials">{getAvatarInitials(messageSender)}</span>}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="no-messages">No messages yet. Say hello!</p>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <form className="message-input-form" onSubmit={handleSendMessage}>
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={handleInputChange}
-                  placeholder={isLoadingChat ? "Loading..." : "Type a message..."}
-                  disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId}
-                />
-                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !currentChatId || !messageInput.trim()}
-                  placeholder={isLoadingChat ? "Loading chat..." : "Type a message..."}
-                  disabled={isLoadingChat || !isSocketConnected || !currentChatId}
-                />
-                <button type="submit" disabled={isLoadingChat || !isSocketConnected || !currentChatId || !messageInput.trim()}>
-                  Send
-                </button>
-              </form>
+        {!isPasswordVerified && showPasswordModal ? (
+          <div className="welcome-chat-prompt">
+            <div className="welcome-chat-icon-container">
+              <BsChatDots className="welcome-chat-icon" />
             </div>
-          )}
-        </section>
+            <h2 className="welcome-chat-title">Re-enter Password for E2EE</h2>
+            <input
+              type="password"
+              value={EE2EInput}
+              onChange={(e) => setEE2EInput(e.target.value)}
+              placeholder="Enter your password"
+              style={{
+                backgroundColor: "var(--input-bg-color)",
+                color: "var(--text-color)",
+                border: "1px solid var(--input-border-color)",
+                borderRadius: "6px",
+                padding: "10px",
+                width: "100%",
+                maxWidth: "300px",
+                marginBottom: "10px",
+              }}
+            />
+            {passwordError && <p style={{ color: 'red', marginBottom: '10px' }}>{passwordError}</p>}
+            <button
+              onClick={verifyPassword}
+              className="message-input-form-button"
+              style={{
+                backgroundColor: "var(--button-primary-bg)",
+                color: "var(--button-primary-text)",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "20px",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.9em",
+              }}
+            >
+              Verify
+            </button>
+          </div>
+        ) : (
+          <section className="chat-area">
+            {!recipientForHeader ? (
+              <div className="welcome-chat-prompt">
+                <div className="welcome-chat-icon-container">
+                  <BsChatDots className="welcome-chat-icon" />
+                </div>
+                <h2 className="welcome-chat-title">Welcome to TriSec!</h2>
+                <p className="welcome-chat-subtitle">
+                  Select a conversation from the sidebar to start chatting
+                </p>
+              </div>
+            ) : (
+              <div className={`chat-window ${isLoadingChat ? 'chat-loading-new-conversation' : ''}`}>
+                <div className="chat-window-header">
+                  <div className="chat-recipient-avatar">
+                    {recipientForHeader.avatar_url ? (
+                      <img src={recipientForHeader.avatar_url} alt="recipient avatar" />
+                    ) : (
+                      <span className="avatar-initials">
+                        {/* MODIFIED: Consistent initials logic */}
+                        {`${recipientForHeader.first_name ? recipientForHeader.first_name[0] : ''}${recipientForHeader.last_name ? recipientForHeader.last_name[0] : ''}`.toUpperCase() || (recipientForHeader.username ? recipientForHeader.username[0].toUpperCase() : 'U')}
+                      </span>
+                    )}
+                  </div>
+                  <div className="chat-recipient-info">
+                    {/* MODIFIED: Use getDisplayName */}
+                    <span className="chat-recipient-name">
+                      {getDisplayName(recipientForHeader)}
+                    </span>
+                    <span className="chat-recipient-status">
+                      {isLoadingChat ? "Connecting..." : (isSocketConnected ? "Online" : "Offline")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="chat-messages-container">
+                  {messages.length > 0 ? (
+                    messages.map((msg) => {
+                      if (!user || !recipientForHeader) return null;
+                      const isSent = msg.created_by === user.id;
+                      const messageSender = isSent ? user : recipientForHeader;
+                      const senderDisplayName = getDisplayName(messageSender); // Get display name for avatar initials if needed
+
+                      // Use first letter of display name for initials if full name isn't available for initials
+                      const avatarInitials = (
+                        (messageSender.first_name ? messageSender.first_name[0] : '') +
+                        (messageSender.last_name ? messageSender.last_name[0] : '')
+                      ).toUpperCase() || (senderDisplayName ? senderDisplayName[0].toUpperCase() : 'U');
+
+                      const isExplodingHeadEmoji = msg.message === '🤯';
+
+                      return (
+                        <div
+                          // key={msg.id || msg.temp_id || Math.random()}
+                          key={msg.id}
+                          className={`message-row ${isSent ? "sent" : "received"}`}
+                        >
+                          {!isSent && (
+                            <div className="chat-message-avatar">
+                              {recipientForHeader.avatar_url ? <img src={recipientForHeader.avatar_url} alt={getDisplayName(recipientForHeader)} /> : <span className="avatar-initials">{avatarInitials}</span>}
+                            </div>
+                          )}
+                          <div className={`message-bubble ${isExplodingHeadEmoji ? 'message-emoji-large' : ''}`}>
+                            {isExplodingHeadEmoji ? (
+                              <span className="emoji-large">🤯</span>
+                            ) : (
+                              <p>{msg.message}</p>
+                            )}
+                            <span className="message-timestamp">{formatTimestamp(msg.created_at)}</span>
+                          </div>
+                          {isSent && (
+                            <div className="chat-message-avatar">
+                              {user.avatar_url ? <img src={user.avatar_url} alt={getDisplayName(user)} /> : <span className="avatar-initials">{avatarInitials}</span>}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    !isLoadingChat && <p className="no-messages">No messages yet. Say hello!</p>
+                  )}
+                  {isLoadingChat && messages.length > 0 && (
+                    <div className="chat-loading-overlay"><p></p></div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                <form className="message-input-form" onSubmit={handleSendMessage}>
+                  <input
+                    type="text"
+                    value={messageInput}
+                    onChange={handleInputChange}
+                    placeholder={isLoadingChat ? "Loading chat..." : "Type a message..."}
+                    disabled={isLoadingChat || !isSocketConnected || !selectedRecipient}
+                  />
+                  <button type="submit" disabled={isLoadingChat || !isSocketConnected || !selectedRecipient || !messageInput.trim()}>
+                    Send
+                  </button>
+                </form>
+              </div>
+            )}
+          </section>
+        )}
       </main>
     </div>
   );

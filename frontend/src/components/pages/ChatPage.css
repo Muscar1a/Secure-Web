@@ -314,14 +314,6 @@ body, html {
     color: var(--secondary-text-color);
 }
 
-/* Chat Window (Image 2) */
-.chat-window {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 0 20px;
-}
 
 .chat-messages-container {
     flex-grow: 1;
@@ -574,15 +566,6 @@ body, html {
     overflow: hidden;
     /* padding: 0 20px; REMOVE this if header and input have their own padding */
     padding: 0; /* Let child elements manage padding */
-}
-
-.message-input-form {
-    /* ... existing styles ... */
-    padding: 15px 20px; /* Add horizontal padding here if removed from .chat-window */
-}
-.chat-messages-container {
-    /* ... existing styles ... */
-    padding: 15px 20px; /* Add horizontal padding here if removed from .chat-window */
 }
 
 

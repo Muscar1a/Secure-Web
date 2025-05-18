@@ -20,10 +20,12 @@ class UserBase(BaseModel):
     username: UsernameStr
     email: str
 
+    public_key_pem: str
+    private_key_pem: str
+
 class UserCreate(UserBase):
     password: str
     # password2: str
-
 
     @field_validator("password")
     def password_complexity(cls, v: str) -> str:
@@ -51,7 +53,9 @@ class UserRead(UserBase):
     is_active: bool
     is_disabled: bool
     roles: list[str] = [] 
+
 User = UserRead
+
 class UserUpdate(BaseModel):
     id: str
     username: Optional[UsernameStr]   = None

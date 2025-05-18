@@ -6,6 +6,7 @@ from exceptions import credentials_exception
 from crud.user import User
 from itsdangerous import URLSafeTimedSerializer
 from jose import JWTError, jwt
+from datetime import datetime, timedelta, timezone
 
 
 class TokenManager:
@@ -18,7 +19,7 @@ class TokenManager:
         # longer-lived refresh tokens
         self.refresh_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     async def get_jwt_access_token(self, subject: str) -> str:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         expire = now + self.access_expires
         payload = {
             "exp": expire, 
@@ -29,7 +30,7 @@ class TokenManager:
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)
 
     async def get_jwt_refresh_token(self, subject: str) -> str:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         expire = now + self.refresh_expires
         payload = {
             "exp": expire,

@@ -39,15 +39,7 @@ class BaseUserManager:
         return await self.user_collection.find_one({'email': email})
 
     async def get_by_username(self, username: str) -> UserInDb:
-        """
-        Fetch a user by username, raising 404 if not found.
-        """
         user = await self.user_collection.find_one({'username': username})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User '{username}' not found"
-            )
         return user
     
 
@@ -60,6 +52,10 @@ class BaseUserManager:
         all_users = await self.get_all()
         # print(all_users)
         return [user for user in all_users if user.id != current_user_id]
+
+    async def get_public_key(self, id: str) -> str:
+        user = await self.user_collection.find_one({'id': id})
+        return user.get('public_key_pem')
 
     async def insert_private_message_recipient(
             self,
@@ -89,18 +85,15 @@ class UserCreator(BaseUserManager):
         existing = await self.user_collection.find_one({'username': user_data.username})
         if existing:
             raise UserCreationError('username', 'Username already in use!')
-
         password_hash = get_password_hash(user_data.password)
         updated_user_data = {
             **user_data.model_dump(),
             'password': password_hash,
             "roles": ["user"],
         }
-
         new_user = UserModel(**updated_user_data)
         payload  = new_user.model_dump(exclude={"id"})
         result   = await self.user_collection.insert_one(payload)
-
         if result.acknowledged:
             oid_str = str(result.inserted_id)
             return await self.get_by_id(oid_str)

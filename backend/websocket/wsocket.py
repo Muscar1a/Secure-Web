@@ -1,5 +1,6 @@
 
-from fastapi import Depends, WebSocket, WebSocketDisconnect, HTTPException
+import json
+from fastapi import Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import ValidationError
 from api.deps import get_private_chat_manager, get_token_manager
 from serializers.chat_serializers import message_serializer
@@ -19,7 +20,7 @@ async def chat_websocket_endpoint(
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
 ):
     await websocket.accept()
-    print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
+    # print(f"[+] WebSocket connection accepted for chat type: {chat_type}, chat ID: {chat_id}")
     
     try:
        user_dict = await token_manager.get_user_form_jwt_token(token, token_subject_key)
@@ -39,12 +40,21 @@ async def chat_websocket_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
-            
+            # json_str = message.decode("utf-8")  # decode bytes -> string
+            data = json.loads(message)
+            # print(f"[--------] Received message: {data.keys()}")
             if chat_type == 'private':
-                new_message = await pvt_chat_manager.create_message(current_user.id, chat_id, message)
+                # print(f'[-] current_user: {current_user}')
+                new_message = await pvt_chat_manager.create_message(
+                    current_user.id, chat_id, 
+                    data['message'], 
+                    data['encrypted_key_sender'],
+                    data['encrypted_key_receiver'],
+                    data['iv'],
+                )
 
             serialized_message = message_serializer(new_message.model_dump())
-            print("[Response Message]", serialized_message)
+            # print("[Response Message]", serialized_message)
     
             for client_ws in connected_clients[chat_id]:
                 print(f"client_ws: {client_ws}")

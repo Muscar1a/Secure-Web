@@ -5,7 +5,6 @@ from pydantic import BaseModel
 class MessageBase(BaseModel):
     message: str
 
-
 class MessageCreate(MessageBase):
     pass
 
@@ -13,8 +12,10 @@ class MessageCreate(MessageBase):
 class Message(MessageBase):
     id: str
     created_by: str
-    created_at: datetime
-  
+    created_at: datetime  
+    encrypted_key_sender: str
+    encrypted_key_receiver: str
+    iv: str
 
 class MessageResponse(Message):
     created_at: str
