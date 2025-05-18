@@ -27,7 +27,7 @@ class TokenManager:
             "sub": subject,
             "iat": now,
             "type": "access",
-            "ver": user["token_version"],
+            "ver": user.get("token_version", 0),
         }
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)
 
@@ -40,7 +40,7 @@ class TokenManager:
             "sub": subject,
             "iat": now,
             "type": "refresh",
-            "ver": user["token_version"],
+            "ver": user.get("token_version", 0),
         }
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)   
 

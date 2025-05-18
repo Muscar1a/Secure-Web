@@ -142,7 +142,7 @@ async def logout(
     user_manager: User = Depends(get_user_manager),
     ):
     # increment their version to invalidate all existing tokens
-    await user_manager.update_one(
+    await user_manager.update_user(
         {"id": current_user.id},
         {"$inc": {"token_version": 1}}
     )

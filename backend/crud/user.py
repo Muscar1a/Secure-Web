@@ -94,6 +94,7 @@ class UserCreator(BaseUserManager):
         }
         new_user = UserModel(**updated_user_data)
         payload  = new_user.model_dump(exclude={"id"})
+        print("📦 create_user payload:", payload)
         result   = await self.user_collection.insert_one(payload)
         if result.acknowledged:
             oid_str = str(result.inserted_id)

@@ -93,12 +93,17 @@ const Register = () => {
       console.error('Registration error:', err);
 
       if (err.response?.status === 422) {
-        // FastAPI sent back: { detail: [ { loc, msg, type }, ... ] }
-        const details = err.response.data.detail;
-        // Map to the human messages and join into one string
-        const messages = Array.isArray(details)
-          ? details.map(e => e.msg).join('; ')
-          : String(details);
+        const errorDetail = err.response.data;
+
+        let messages = '';
+        if (errorDetail.errors && Array.isArray(errorDetail.errors)) {
+          messages = errorDetail.errors.map(e => e.message).join('; ');
+        } else if (typeof errorDetail.detail === 'string') {
+          messages = errorDetail.detail;
+        } else {
+          messages = 'Validation error occurred.';
+        }
+
         setError(messages);
       } else {
         setError(err.response?.data?.detail || 'Registration failed. Please try again.');

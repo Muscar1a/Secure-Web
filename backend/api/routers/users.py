@@ -37,8 +37,8 @@ async def register(
                 'error': 'Validation Field',
                 'errors': [
                     {
-                        'field': e.field,
-                        'message': e.message
+                        'field': "Username",
+                        'message': "Username already in use!"
                     }
                 ]
             }
