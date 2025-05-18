@@ -20,7 +20,6 @@ async def register(
     user_in: schemas.UserCreate,
     user_manager: User = Depends(get_user_manager),
 ):
-    print('---->user_in', user_in)
     try:
         new_user = await user_manager.create_user(user_in)
         return new_user

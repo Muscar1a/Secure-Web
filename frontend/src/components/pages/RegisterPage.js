@@ -74,8 +74,8 @@ const Register = () => {
 
     const encryptedPrivateKeyPem = encryptPrivateKey(privateKeyPem, password);
 
-    console.log('Public Key:', publicKeyPem);
-    console.log('Encrypted Private Key:', encryptedPrivateKeyPem);
+    // console.log('Public Key:', publicKeyPem);
+    // console.log('Encrypted Private Key:', encryptedPrivateKeyPem);
 
     try {
       const response = await axios.post(`${host}/users/register`, {

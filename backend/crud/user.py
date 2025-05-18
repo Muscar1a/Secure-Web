@@ -28,15 +28,7 @@ class BaseUserManager:
         return await self.user_collection.find_one({'email': email})
 
     async def get_by_username(self, username: str) -> UserInDb:
-        """
-        Fetch a user by username, raising 404 if not found.
-        """
         user = await self.user_collection.find_one({'username': username})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User '{username}' not found"
-            )
         return user
     
 
@@ -82,17 +74,14 @@ class UserCreator(BaseUserManager):
         existing_user = await self.get_by_username(user_data.username)
         if existing_user:
             raise UserCreationError('Email', 'Email already in use!')
-
         password_hash = get_password_hash(user_data.password)
         updated_user_data = {
             **user_data.model_dump(),
             'password': password_hash,
             "roles": ["user"],
         }
-
         new_user = UserModel(**updated_user_data)
         result = await self.user_collection.insert_one(new_user.model_dump())
-
         if result.acknowledged:
             return await self.get_by_id(new_user.id)
 
