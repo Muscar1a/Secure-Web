@@ -1,5 +1,5 @@
 import re
-from pydantic import BaseModel, field_validator, constr
+from pydantic import BaseModel, field_validator, constr, Field
 from typing import Optional
 
 from schemas.chat import MessageRecipient
@@ -22,6 +22,8 @@ class UserBase(BaseModel):
 
     public_key_pem: str
     private_key_pem: str
+
+    token_version: int = Field(0)
 
 class UserCreate(UserBase):
     password: str

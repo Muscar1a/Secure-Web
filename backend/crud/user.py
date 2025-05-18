@@ -11,7 +11,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from exceptions import UserCreationError
 from core.config import settings
 from bson import ObjectId 
-
+from bson.errors import InvalidId
 class BaseUserManager:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
@@ -90,6 +90,7 @@ class UserCreator(BaseUserManager):
             **user_data.model_dump(),
             'password': password_hash,
             "roles": ["user"],
+            "token_version": 0, 
         }
         new_user = UserModel(**updated_user_data)
         payload  = new_user.model_dump(exclude={"id"})
@@ -107,7 +108,7 @@ class UserUpdater(BaseUserManager):
         # validate & cast
         try:
             oid = ObjectId(updated_data.id)
-        except:
+        except InvalidId:
             raise HTTPException(400, "Invalid user ID format")
         result = await self.user_collection.update_one(
             {'_id': oid},

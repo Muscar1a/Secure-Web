@@ -23,8 +23,7 @@ class UserModel(BaseModel):
     private_key_pem: str
 
     class Config:
-        # allow_population_by_field_name = True
-        schema_extra = {
+           schema_extra = {
             "example": {
                 "id": "00010203-0405-0607-0809-0a0b0c0d0e0f",
                 "first_name": "John",

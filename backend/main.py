@@ -50,8 +50,6 @@ app.include_router(chat.router)
 
 
 
-#   WebSocket
-# websocket = APIWebSocketRoute("/ws/chat/{chat_type}/{chat_id}/token={token}", chat_websocket_endpoint)
 websocket = APIWebSocketRoute("/ws/chat/{chat_type}/{chat_id}", chat_websocket_endpoint)
 
 app.router.routes.append(websocket)

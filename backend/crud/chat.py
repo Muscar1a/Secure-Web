@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from core.config import settings
 from crud.user import User
-# from app.crud.user import db_get_user_by_id
 from models import (
     MessageModel,
     MessageRecipientModel,
@@ -11,12 +10,6 @@ from models import (
 import schemas
 from serializers import serializers
 
-
-# async def is_chat_member(user_id: str, chat_id: str, db: AsyncIOMotorDatabase) -> bool:
-#     chat = db_get_chat(chat_id, db)
-#     if user_id in chat.get('members'):
-#         return True
-#     return False
 
 class ChatNotFoundException(Exception):
     pass
@@ -31,7 +24,6 @@ class BaseChatManager:
     async def get_chat_by_id(self, chat_id: str) -> dict:
         chat = await self.chat_collection.find_one({'chat_id': chat_id})
         if not chat:
-            # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Chat not found')
             raise ChatNotFoundException(f'Chat with id {chat_id} not found')
         return chat
 
@@ -90,7 +82,6 @@ class BaseChatManager:
         )
 
         if result.matched_count == 1 and result.modified_count == 1:
-            # return {"message": "Item added to profile successfully"}
             return new_message
 
 
@@ -190,7 +181,6 @@ class PrivateChatManager(BaseChatManager):
         # user = await self.chat_collection.find_one(query)
 
         user = await self.user_manager.get_by_id(current_user_id)
-        # print('-------------user: ', user)
         # print('user[\'private_message_recipients\']: ', user['private_message_recipients'] )
         if user['private_message_recipients']:
             for recipient in user['private_message_recipients']:

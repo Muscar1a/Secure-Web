@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 _client =   AsyncIOMotorClient(
     settings.MONGODB_URL,
     tls=True,
-    # tlsAllowInvalidCertificates=True  # only for quick local dev
 )
 mongodb = _client[settings.MONGODB_DB_NAME]
 

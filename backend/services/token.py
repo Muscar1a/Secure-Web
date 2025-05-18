@@ -19,6 +19,7 @@ class TokenManager:
         # longer-lived refresh tokens
         self.refresh_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     async def get_jwt_access_token(self, subject: str) -> str:
+        user = await self.user_manager.get_by_id(subject)
         now = datetime.now(timezone.utc)
         expire = now + self.access_expires
         payload = {
@@ -26,10 +27,12 @@ class TokenManager:
             "sub": subject,
             "iat": now,
             "type": "access",
+            "ver": user["token_version"],
         }
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)
 
     async def get_jwt_refresh_token(self, subject: str) -> str:
+        user = await self.user_manager.get_by_id(subject)
         now = datetime.now(timezone.utc)
         expire = now + self.refresh_expires
         payload = {
@@ -37,6 +40,7 @@ class TokenManager:
             "sub": subject,
             "iat": now,
             "type": "refresh",
+            "ver": user["token_version"],
         }
         return jwt.encode(payload, self.jwt_secret_key, algorithm=self.jwt_algorithm)   
 
@@ -59,6 +63,9 @@ class TokenManager:
 
     async def get_user_form_jwt_token(self, token: str, subject_key: str) -> schemas.User:
         token_data = await self.get_data_form_jwt_token(token)
+        user = await self.user_manager.get_by_id(token_data["sub"])
+        if token_data.get("ver") != user["token_version"]:
+            raise credentials_exception 
         subject = token_data.get("sub")
 
         if subject_key == "id":

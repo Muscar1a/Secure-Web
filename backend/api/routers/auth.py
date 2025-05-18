@@ -8,7 +8,7 @@ from datetime import datetime
 import datetime
 from datetime import timezone
 
-from api.deps import get_token_manager, get_user_manager
+from api.deps import get_token_manager, get_user_manager, get_current_active_user
 from services.token import TokenManager
 from schemas.token import Token
 import schemas
@@ -135,3 +135,15 @@ async def reset_password(
     )
 
     return {"msg": "Password has been reset successfully."}
+
+@router.post("/logout")
+async def logout(
+    current_user: schemas.User = Depends(get_current_active_user),
+    user_manager: User = Depends(get_user_manager),
+    ):
+    # increment their version to invalidate all existing tokens
+    await user_manager.update_one(
+        {"id": current_user.id},
+        {"$inc": {"token_version": 1}}
+    )
+    return {"msg": "Logged out and revoked prior tokens"}

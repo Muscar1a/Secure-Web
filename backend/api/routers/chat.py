@@ -13,7 +13,7 @@ from schemas.chat import ChatCreationResponse, PrivateChatResponse
 router = APIRouter(prefix='/chat', tags=["Chat"])
 
 async def verify_chat_participant(
-    chat_id: ObjectIdStr = Path(..., description="24-hex Chat ID"),
+    chat_id: ObjectIdStr = Path(...),
     current_user=Depends(get_current_active_user),
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
 ) -> shared.PrivateChatResponseWithRecipient:
@@ -63,7 +63,7 @@ async def get_private_chat(
 @router.get('/private/recipient/chat-id/{recipient_id}',
             response_model=schemas.ChatId)
 async def get_recipient_chat_id(
-    recipient_id: ObjectIdStr = Path(..., description="24-hex User ID"),
+    recipient_id: ObjectIdStr = Path(...),
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
@@ -88,7 +88,7 @@ async def get_all_private_chats(
     summary="Return existing private chat or create a new one",
 )
 async def create_private_chat(
-    recipient_id: ObjectIdStr = Path(..., description="24-hex User ID"),
+    recipient_id: ObjectIdStr = Path(...),
     mgr: PrivateChatManager = Depends(get_private_chat_manager),
     current_user: User = Depends(get_current_active_user),
 ):

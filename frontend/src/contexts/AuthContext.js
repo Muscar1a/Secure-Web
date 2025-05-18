@@ -72,10 +72,25 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('chatPageReloaded'); // Xóa flag reload
+  const logout = async () => {
+    try {
+      // 1) Tell the backend to revoke tokens
+      await axios.post(
+        `${host}/auth/logout`,
+        {},  // no body needed
+        {
+          headers: { Authorization: `Bearer ${authState.token}` }
+        }
+      );
+    } catch (err) {
+      // Log the error for debugging purposes
+      console.error('Logout error:', err);
+    }
+
+    // 2) Clear local storage and reset state
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("chatPageReloaded");
 
     setAuthState({
       isAuthenticated: false,
@@ -84,7 +99,11 @@ export const AuthProvider = ({ children }) => {
       loading: false,
       checked: true,
     });
+
+    // 3) Optionally redirect to login
+    window.location.href = "/login";
   };
+  
   return (
     <AuthContext.Provider value={{ ...authState, setAuthState, logout, loginSuccess }}>
       {children}

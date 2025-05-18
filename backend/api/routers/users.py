@@ -63,7 +63,7 @@ async def read_me(
         status_code=status.HTTP_200_OK, response_model=schemas.User
 )       
 async def get_user_detail(
-    user_id: ObjectIdStr = Path(..., description="24-hex User ID"),
+    user_id: ObjectIdStr = Path(...),
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
@@ -79,7 +79,7 @@ async def get_user_detail(
     status_code=status.HTTP_200_OK,
 )
 async def get_user_by_username(
-    username: UsernameStr = Path(..., description="Alphanumeric username"),
+    username: UsernameStr = Path(...),
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user),
 ):
@@ -107,14 +107,8 @@ async def get_all_user(
         response_model=schemas.User
 )
 async def update_user(
-    user_id: ObjectIdStr = Path(
-        ...,
-        description="24-hex User ID"
-    ),
-    updated_data: schemas.UserUpdate = Body(
-        ...,
-        description="User data to update"
-    ),
+    user_id: ObjectIdStr = Path(...),
+    updated_data: schemas.UserUpdate = Body(...),
     user_manager: User = Depends(get_user_manager),
     _: schemas.User = Depends(requires_role("admin"))
 ):
@@ -126,7 +120,7 @@ async def update_user(
         status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_user(
-    user_id: ObjectIdStr = Path(..., description="24-hex User ID"),
+    user_id: ObjectIdStr = Path(...),
     user_manager: User = Depends(get_user_manager),
     _: schemas.User = Depends(requires_role("admin"))
 ):

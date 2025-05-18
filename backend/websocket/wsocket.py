@@ -40,7 +40,6 @@ async def chat_websocket_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
-            # json_str = message.decode("utf-8")  # decode bytes -> string
             data = json.loads(message)
             # print(f"[--------] Received message: {data.keys()}")
             if chat_type == 'private':
@@ -61,7 +60,7 @@ async def chat_websocket_endpoint(
                 await client_ws.send_json(serialized_message)
     
     except WebSocketDisconnect:
-        print(f"[+] WebSocket connection closed")
+        print("[+] WebSocket connection closed")
         
     finally:
         print(f"Removed disconnected client websocket: {websocket} from the Chat id: {chat_id}")

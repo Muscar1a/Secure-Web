@@ -45,7 +45,7 @@ async def get_current_user(
     
     try:
         return schemas.User(**user_data)
-    except ValidationError as e:
+    except ValidationError:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid user data")
 
 # Dependency to create a User instance
