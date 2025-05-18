@@ -41,7 +41,9 @@ class UserRead(UserBase):
     is_active: bool
     is_disabled: bool
     roles: list[str] = [] 
+
 User = UserRead
+
 class UserUpdate(BaseModel):
     id: str
     username: Optional[str]   = None

@@ -42,7 +42,7 @@ class BaseUserManager:
         # print(all_users)
         return [user for user in all_users if user.id != current_user_id]
 
-    async def get_public_key(self, user_id: str) -> str:
+    async def get_public_key(self, id: str) -> str:
         user = await self.user_collection.find_one({'id': id})
         return user.get('public_key_pem')
 
