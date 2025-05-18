@@ -8,7 +8,17 @@ from crud.chat import PrivateChatManager
 from services.token import TokenManager
 from schemas import shared
 import schemas
+import time
+from collections import defaultdict, deque
+
 connected_clients: dict[str, set] = dict()
+
+
+# rate limit 
+message_timestamps: dict[str, deque] = defaultdict(lambda: deque())
+
+RATE_LIMIT = 5
+INTERVAL = 1
 
 async def chat_websocket_endpoint(
     chat_type: str,
@@ -40,6 +50,20 @@ async def chat_websocket_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
+            
+            #  Rate limit check 
+            now = time.time()
+            timestamps = message_timestamps[current_user.id]
+            timestamps.append(now)
+            
+            # Remove timestamps outside the rate limit interval
+            while timestamps and now - timestamps[0] > INTERVAL:
+                timestamps.popleft()
+            if len(timestamps) > RATE_LIMIT:
+                await websocket.send_json({"error": "Too many messages. Please wait."})
+                continue
+            #  ==========================
+            
             # json_str = message.decode("utf-8")  # decode bytes -> string
             data = json.loads(message)
             # print(f"[--------] Received message: {data.keys()}")

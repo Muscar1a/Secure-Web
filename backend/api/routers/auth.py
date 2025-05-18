@@ -81,7 +81,7 @@ class ResetPasswordRequest(BaseModel):
     
 # request reset
 @router.post("/request-password-reset")
-@limiter.limit("5/minute") 
+@limiter.limit("2/10minute")
 async def request_password_reset(
     request: Request,
     req: PasswordResetRequest,
@@ -96,7 +96,7 @@ async def request_password_reset(
 
 # reset password
 @router.post("/reset-password")
-@limiter.limit("5/minute") 
+@limiter.limit("2/10minute")
 async def reset_password(
     request: Request,
     req: ResetPasswordRequest,
