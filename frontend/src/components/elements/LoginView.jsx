@@ -29,7 +29,7 @@ const LoginView = ({
         <header className="header">
            <div className="logo">
              {typeof BsChatSquare !== 'undefined' && <BsChatSquare className="logo-icon" />} 
-              TriSec {/* Bạn có thể đổi thành Chatty nếu muốn */}
+              TriSec 
            </div>
            <Link to="/settings" className="nav-item settings-button"> {/* Sử dụng class nav-item cho nhất quán nếu có và settings-button */}
              {typeof IoSettingsOutline !== 'undefined' && <IoSettingsOutline className="settings-icon" style={{ marginRight: '5px', verticalAlign: 'middle' }} />} 

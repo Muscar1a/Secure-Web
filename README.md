@@ -7,6 +7,14 @@ venv\Scripts\activate     # on Windows<br>
 ### installing dependencies
 pip install fastapi uvicorn sqlalchemy pydantic python-jose[cryptography] passlib[bcrypt] python-multipart motor pydantic_settings pydantic[email] pymongo<br>
 pip install -r requirements.txt #optional, only if the dependencies did not work.<br>
+## Local HTTPS Setup
+
+We use mkcert for dev TLS certificates. On your machine:
+
+1. Install mkcert (see https://github.com/FiloSottile/mkcert).  
+2. `mkcert -install`  ← this adds the root CA to your OS/browser.  
+3. `mkcert -cert-file backend/cert.pem -key-file backend/key.pem localhost 127.0.0.1 ::1`  
+4. `npm start` (React) and your usual uvicorn command will now be trusted.
 ### turn on localhost
 uvicorn main:app --port 8000 --reload --ssl-keyfile ./key.pem --ssl-certfile ./cert.pem<br>
 
