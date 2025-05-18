@@ -12,9 +12,7 @@ import ForgotPasswordPage from './components/pages/ForgotPasswordPage'
 import ProfilePage from './components/pages/ProfilePage';
 
 const PrivateLayout = () => (
-  <>
     <Outlet />
-  </>
 );
 
 

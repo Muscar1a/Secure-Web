@@ -1,52 +1,41 @@
-/* LoginPage.css - Đã sửa để DÙNG BIẾN CSS TỪ THEME */
-
-/* Bỏ khai báo màu cố định cho body ở đây nếu themeUtils.js đã xử lý cho <html> */
-/* body {
-  background-color: #121212; 
-  color: #e0e0e0;
-} */
-
-/* Class cha của toàn bộ trang login */
-.login-page { /* Hoặc tên class tương tự bạn dùng trong LoginPage.js */
+.login-page {
   background-color: var(--bg-color);
   color: var(--text-color);
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; 
-  /* justify-content: center; Bỏ nếu có header và muốn header ở trên */
+  overflow-y: auto;
 }
 
-/* Header chung (nếu LoginPage có header giống RegisterPage) */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px; /* Đồng bộ padding */
-  background-color: var(--sidebar-bg-color); /* Hoặc --header-bg-color nếu có */
+  padding: 15px 30px;
+  background-color: var(--sidebar-bg-color);
   flex-shrink: 0;
   border-bottom: 1px solid var(--divider-color);
 }
 
 .logo {
-  font-size: 1.3em; /* Đồng bộ font size */
-  font-weight: 600; 
-  color: var(--accent-color); /* Logo màu accent */
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--accent-color);
   display: flex;
   align-items: center;
-  gap: 8px; 
+  gap: 8px;
 }
 
 .logo-icon {
-  font-size: 1.2em; /* Đồng bộ font size */
-  color: var(--accent-color); 
+  font-size: 1.2em;
+  color: var(--accent-color);
 }
 
-.settings-button { /* Nút settings trên header */
+.settings-button {
   background: none;
   border: none;
-  color: var(--secondary-text-color); 
+  color: var(--secondary-text-color);
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -55,35 +44,31 @@
   transition: color 0.2s ease;
 }
 .settings-button:hover {
-    color: var(--accent-color); /* Hover màu accent */
+    color: var(--accent-color);
 }
 .settings-icon {
-   font-size: 1.1rem; 
-   /* Màu kế thừa từ .settings-button */
+   font-size: 1.1rem;
 }
 
-/* Main content area */
-.main-content { /* Giữ nguyên cấu trúc flex */
+.main-content {
   display: flex;
   flex-grow: 1;
   padding: 40px 30px;
-  gap: 50px; 
+  gap: 50px;
   justify-content: center;
   align-items: center;
-  /* overflow: hidden; Có thể bỏ nếu .login-page đã có overflow-y: auto */
 }
 
-/* Form container */
 .form-container {
-  flex: 0 1 480px; 
+  flex: 0 1 480px;
   max-width: 480px;
   display: flex;
   flex-direction: column;
-  background-color: var(--sidebar-bg-color); /* Nền cho form, giống header/sidebar */
+  background-color: var(--sidebar-bg-color);
   padding: 30px 40px;
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Giữ shadow nếu muốn */
-  border: 1px solid var(--divider-color); /* Thêm viền nhẹ cho form */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border: 1px solid var(--divider-color);
 }
 
 .form-icon-container {
@@ -91,27 +76,27 @@
   text-align: center;
 }
 
-.form-icon { /* Icon chat trên tiêu đề form */
-  background-color: var(--input-bg-color); 
-  color: var(--accent-color); 
+.form-icon {
+  background-color: var(--input-bg-color);
+  color: var(--accent-color);
   padding: 15px;
   border-radius: 12px;
   display: inline-block;
-  font-size: 1.8rem; 
-  line-height: 1; 
+  font-size: 1.8rem;
+  line-height: 1;
 }
 
-.form-container h2 { /* Tiêu đề "Login" hoặc "Sign In" */
+.form-container h2 {
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text-color); /* Chữ chính */
+  color: var(--text-color);
   text-align: center;
 }
 
 .form-container .subtitle {
   font-size: 0.9rem;
-  color: var(--secondary-text-color); /* Chữ phụ */
+  color: var(--secondary-text-color);
   margin-bottom: 30px;
   text-align: center;
 }
@@ -132,7 +117,7 @@
 .input-group label {
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--secondary-text-color); /* Label màu chữ phụ */
+  color: var(--secondary-text-color);
   margin-left: 2px;
 }
 
@@ -147,7 +132,7 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--placeholder-text-color); /* Icon trong input giống placeholder */
+  color: var(--placeholder-text-color);
   font-size: 1rem;
   pointer-events: none;
 }
@@ -157,8 +142,8 @@
   padding: 14px 15px 14px 45px;
   background-color: var(--input-bg-color);
   border: 1px solid var(--input-border-color);
-  border-radius: 8px; 
-  color: var(--text-color); /* Chữ nhập vào màu chính */
+  border-radius: 8px;
+  color: var(--text-color);
   font-size: 0.9rem;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -171,29 +156,29 @@
 .input-wrapper input:focus {
   outline: none;
   border-color: var(--input-focus-border-color);
-  box-shadow: 0 0 0 3px var(--input-focus-shadow-color); /* Đảm bảo có biến này trong theme */
+  box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
 }
 
 .input-wrapper input[type="password"] {
-  padding-right: 45px; 
+  padding-right: 45px;
 }
 
-.password-toggle { /* Icon mắt */
+.password-toggle {
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--placeholder-text-color); 
+  color: var(--placeholder-text-color);
   cursor: pointer;
   font-size: 1.1rem;
 }
 .password-toggle:hover {
-    color: var(--secondary-text-color); 
+    color: var(--secondary-text-color);
 }
 
-.submit-button { /* Nút "Login" / "Sign In" */
-  background-color: var(--button-primary-bg); 
-  color: var(--button-primary-text); 
+.submit-button {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
   border: none;
   padding: 14px 20px;
   border-radius: 8px;
@@ -205,40 +190,39 @@
   width: 100%;
 }
 .submit-button:hover:not(:disabled) {
-  background-color: var(--button-primary-hover-bg); 
+  background-color: var(--button-primary-hover-bg);
 }
 .submit-button:active:not(:disabled) {
     transform: scale(0.98);
 }
 .submit-button:disabled {
-    background-color: var(--button-primary-hover-bg); /* Hoặc màu disabled riêng */
-    color: rgba(var(--bg-color-rgb, 33, 31, 38), 0.6); /* Giả sử có bg-color-rgb */
+    background-color: var(--button-primary-hover-bg);
+    color: rgba(var(--bg-color-rgb, 33, 31, 38), 0.6);
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-.signup-link, .extra-links { /* Class cho link "Create account" hoặc "Forgot password" */
+.signup-link, .extra-links {
   text-align: center;
-  margin-top: 25px; 
+  margin-top: 25px;
   font-size: 0.9rem;
-  color: var(--secondary-text-color); 
+  color: var(--secondary-text-color);
 }
 .signup-link a, .extra-links a {
-  color: var(--accent-color); 
+  color: var(--accent-color);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s ease, text-decoration 0.2s ease;
   margin-left: 4px;
 }
 .signup-link a:hover, .extra-links a:hover {
-  filter: brightness(1.2); /* Làm sáng màu accent */
+  filter: brightness(1.2);
   text-decoration: underline;
 }
 
-/* Phần Community (nếu LoginPage có) */
 .community-container {
-  flex: 0 1 400px; 
-  max-width: 400px; 
+  flex: 0 1 400px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -254,14 +238,14 @@
   margin-bottom: 30px;
 }
 .community-item {
-  background-color: var(--input-bg-color); 
+  background-color: var(--input-bg-color);
   border-radius: 10px;
   aspect-ratio: 1 / 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem; 
-  color: var(--secondary-text-color); 
+  font-size: 2rem;
+  color: var(--secondary-text-color);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 .community-item:hover {
@@ -272,21 +256,21 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 15px;
-  color: var(--text-color); 
+  color: var(--text-color);
   text-align: center;
 }
 .community-container p {
   font-size: 0.9rem;
-  color: var(--secondary-text-color); 
+  color: var(--secondary-text-color);
   line-height: 1.5;
   text-align: center;
   max-width: 320px;
 }
 
 .error-message {
-    background-color: rgba(216, 64, 64, 0.1); /* Nên có biến màu lỗi riêng, ví dụ --error-bg */
-    color: #ff9999; /* Ví dụ --error-text */
-    border: 1px solid rgba(216, 64, 64, 0.4); /* Ví dụ --error-border */
+    background-color: rgba(216, 64, 64, 0.1);
+    color: #ff9999;
+    border: 1px solid rgba(216, 64, 64, 0.4);
     padding: 12px 15px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -294,39 +278,27 @@
     text-align: center;
 }
 
-/* LoginPage.css hoặc file CSS liên quan */
-
-/* ... (các style hiện tại của bạn) ... */
-
 .forgot-password-link {
-  text-align: right; /* Căn phải, hoặc center, left tùy ý bạn */
-  margin-top: -10px; /* Điều chỉnh để nó nằm gần ô password hơn, trước nút Sign In */
-  margin-bottom: 20px; /* Khoảng cách với nút Sign In */
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 20px;
   font-size: 0.85rem;
 }
 
 .forgot-password-link a {
-  color: var(--secondary-text-color); /* Hoặc màu accent nếu muốn nổi bật hơn */
+  color: var(--secondary-text-color);
   text-decoration: none;
   transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 
 .forgot-password-link a:hover {
-  color: var(--accent-color); /* Màu accent khi hover */
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
-/* Điều chỉnh lại margin-top của submit-button nếu cần */
-.submit-button {
-  /* ... */
-  margin-top: 10px; /* Hoặc giá trị khác sau khi đã có link forgot password */
-}
-
-.signup-link { 
+.signup-link {
   text-align: center;
-  margin-top: 25px; /* Đảm bảo có khoảng cách hợp lý */
+  margin-top: 25px;
   font-size: 0.9rem;
-  color: var(--secondary-text-color); 
+  color: var(--secondary-text-color);
 }
-
-/* ... (các style khác) ... */

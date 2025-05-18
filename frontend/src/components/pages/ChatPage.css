@@ -12,37 +12,30 @@ body, html {
 }
 
 :root {
-    /* New color palette from login page */
-    --bg-color: #211F26;                     /* Main background */
-    --sidebar-bg-color: #1A181F;            /* Sidebar and Header background */
-    --text-color: #e0e0e0;                  /* Primary text color */
-    --accent-color: #D89E40;                /* Accent color (orange/gold) */
-    --secondary-text-color: #a0a0a0;        /* Muted text for subtitles, status */
-    --divider-color: #3a3740;               /* Borders and dividers */
-    
-    --contact-item-hover-bg: #2E2B36;       /* Hover for items, also input bg */
-    --contact-item-active-bg: #D89E40;      /* Active contact uses accent */
-    --contact-item-active-text: #1A181F;   /* Text color for active contact (dark on light accent) */
-    
-    --sent-message-bg: #D89E40;             /* Sent messages use accent color */
-    --sent-message-text: #1A181F;           /* Dark text on accent background */
-    --received-message-bg: #2E2B36;         /* Received messages darker gray */
-    --received-message-text: #e0e0e0;       /* Light text on dark gray */
-    
-    --input-bg-color: #2E2B36;              /* Input field background */
-    --input-border-color: #4a4750;          /* Input field border */
-    --input-focus-border-color: #D89E40;    /* Input focus border */
-    --placeholder-text-color: #8A888F;      /* Placeholder text */
-
-    --avatar-bg-color: #2E2B36;             /* Background for avatar placeholders */
-    --avatar-text-color: #D89E40;           /* Text color for avatar initials (accent) */
-
-    --scrollbar-thumb-color: #D89E40;       /* Scrollbar thumb uses accent */
-    --scrollbar-track-color: #1A181F;       /* Scrollbar track matches sidebar bg */
-
-    --button-primary-bg: #D89E40;           /* Primary button background (Send) */
-    --button-primary-text: #1A181F;         /* Primary button text */
-    --button-primary-hover-bg: #c9913a;     /* Primary button hover */
+    --bg-color: #211F26;
+    --sidebar-bg-color: #1A181F;
+    --text-color: #e0e0e0;
+    --accent-color: #D89E40;
+    --secondary-text-color: #a0a0a0;
+    --divider-color: #3a3740;
+    --contact-item-hover-bg: #2E2B36;
+    --contact-item-active-bg: #D89E40;
+    --contact-item-active-text: #1A181F;
+    --sent-message-bg: #D89E40;
+    --sent-message-text: #1A181F;
+    --received-message-bg: #2E2B36;
+    --received-message-text: #e0e0e0;
+    --input-bg-color: #2E2B36;
+    --input-border-color: #4a4750;
+    --input-focus-border-color: #D89E40;
+    --placeholder-text-color: #8A888F;
+    --avatar-bg-color: #2E2B36;
+    --avatar-text-color: #D89E40;
+    --scrollbar-thumb-color: #D89E40;
+    --scrollbar-track-color: #1A181F;
+    --button-primary-bg: #D89E40;
+    --button-primary-text: #1A181F;
+    --button-primary-hover-bg: #c9913a;
 }
 
 .loading-screen {
@@ -64,13 +57,12 @@ body, html {
     overflow: hidden;
 }
 
-/* Header */
 .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 25px;
-    background-color: var(--sidebar-bg-color); /* Consistent with sidebar */
+    background-color: var(--sidebar-bg-color);
     border-bottom: 1px solid var(--divider-color);
     flex-shrink: 0;
 }
@@ -78,11 +70,8 @@ body, html {
 .header-title {
     font-size: 1.3em;
     font-weight: 600;
-    color: var(--text-color); /* Main text color for title */
+    color: var(--text-color);
 }
-/* Optional: If you want the "Chatty" title to use accent */
-/* .header-title { color: var(--accent-color); } */
-
 
 .header-nav {
     display: flex;
@@ -103,9 +92,9 @@ body, html {
     padding: 0;
     font-family: inherit;
 }
-.nav-item .settings-icon, /* Assuming you might reuse icon class */
-.nav-item svg { /* For React Icons */
-    color: var(--secondary-text-color); /* Match text color */
+.nav-item .settings-icon,
+.nav-item svg {
+    color: var(--secondary-text-color);
     transition: color 0.2s ease;
 }
 
@@ -123,18 +112,15 @@ body, html {
 }
 .nav-item-logout:hover {
     background-color: var(--contact-item-hover-bg);
-    color: var(--accent-color); /* Ensure text also changes if background changes */
+    color: var(--accent-color);
 }
 
-
-/* Main Content Area */
 .chat-main {
     display: flex;
     flex-grow: 1;
     overflow: hidden;
 }
 
-/* Sidebar */
 .chat-sidebar {
     width: 270px;
     background-color: var(--sidebar-bg-color);
@@ -157,7 +143,7 @@ body, html {
     margin-bottom: 5px;
 }
 
-.sidebar-icon { /* Icon next to "Contacts" */
+.sidebar-icon {
     color: var(--accent-color);
     font-size: 1.1em;
 }
@@ -196,7 +182,7 @@ body, html {
     cursor: pointer;
     transition: background-color 0.2s ease, border-left 0.2s ease, color 0.2s ease;
     border-left: 3px solid transparent;
-    color: var(--text-color); /* Default text color for contact item */
+    color: var(--text-color);
 }
 
 .contact-item:hover {
@@ -205,14 +191,13 @@ body, html {
 
 .contact-item.active {
     background-color: var(--contact-item-active-bg);
-    border-left-color: var(--accent-color); /* Keep accent on border */
-    color: var(--contact-item-active-text); /* Dark text on light accent bg */
+    border-left-color: var(--accent-color);
+    color: var(--contact-item-active-text);
 }
 .contact-item.active .contact-name,
 .contact-item.active .contact-status {
     color: var(--contact-item-active-text);
 }
-
 
 .contact-avatar {
     width: 38px;
@@ -223,7 +208,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--avatar-text-color); /* Initials use accent color */
+    color: var(--avatar-text-color);
     font-weight: 500;
     font-size: 0.9em;
     flex-shrink: 0;
@@ -238,7 +223,6 @@ body, html {
     font-size: 0.9em;
 }
 
-
 .contact-info {
     display: flex;
     flex-direction: column;
@@ -247,7 +231,6 @@ body, html {
 
 .contact-name {
     font-weight: 500;
-    /* color: var(--text-color); Inherited from .contact-item */
     font-size: 0.9em;
     white-space: nowrap;
     overflow: hidden;
@@ -256,10 +239,8 @@ body, html {
 
 .contact-status {
     font-size: 0.75em;
-    color: var(--secondary-text-color); /* Default status color */
+    color: var(--secondary-text-color);
 }
-/* If contact is active, status text color changes via .contact-item.active */
-
 
 .sidebar-message {
     padding: 20px;
@@ -269,7 +250,6 @@ body, html {
     font-size: 0.9em;
 }
 
-/* Chat Area */
 .chat-area {
     flex-grow: 1;
     display: flex;
@@ -278,7 +258,6 @@ body, html {
     background-color: var(--bg-color);
 }
 
-/* Welcome Prompt (Image 1) */
 .welcome-chat-prompt {
     flex-grow: 1;
     display: flex;
@@ -290,21 +269,21 @@ body, html {
 }
 
 .welcome-chat-icon-container {
-    background-color: var(--input-bg-color); /* Match input field bg */
+    background-color: var(--input-bg-color);
     border-radius: 12px;
     padding: 18px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Keep shadow subtle */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .welcome-chat-icon {
     font-size: 3.5em;
-    color: var(--accent-color); /* Icon uses accent color */
+    color: var(--accent-color);
 }
 
 .welcome-chat-title {
     font-size: 1.6em;
-    color: var(--text-color); /* Main text for title */
+    color: var(--text-color);
     margin-bottom: 8px;
     font-weight: 500;
 }
@@ -313,7 +292,6 @@ body, html {
     font-size: 0.95em;
     color: var(--secondary-text-color);
 }
-
 
 .chat-messages-container {
     flex-grow: 1;
@@ -333,7 +311,6 @@ body, html {
     border-radius: 3px;
 }
 
-
 .message-row {
     display: flex;
     margin-bottom: 12px;
@@ -348,7 +325,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--avatar-text-color); /* Avatar initials use accent */
+    color: var(--avatar-text-color);
     font-weight: 500;
     font-size: 0.8em;
     flex-shrink: 0;
@@ -359,7 +336,6 @@ body, html {
     border-radius: 50%;
     object-fit: cover;
 }
-
 
 .message-bubble {
     max-width: 70%;
@@ -377,19 +353,18 @@ body, html {
 
 .message-timestamp {
     font-size: 0.7em;
-    color: var(--secondary-text-color); /* Muted color for timestamp */
+    color: var(--secondary-text-color);
     display: block;
     text-align: right;
     margin-top: 2px;
 }
 
-/* Sent messages */
 .message-row.sent {
     justify-content: flex-end;
 }
 .message-row.sent .message-bubble {
-    background-color: var(--sent-message-bg); /* Accent color for sent */
-    color: var(--sent-message-text);         /* Dark text on accent */
+    background-color: var(--sent-message-bg);
+    color: var(--sent-message-text);
     border-bottom-right-radius: 4px;
     margin-left: 8px;
 }
@@ -397,13 +372,12 @@ body, html {
     margin-left: 8px;
 }
 
-/* Received messages */
 .message-row.received {
     justify-content: flex-start;
 }
 .message-row.received .message-bubble {
-    background-color: var(--received-message-bg); /* Darker gray for received */
-    color: var(--received-message-text);         /* Light text on dark gray */
+    background-color: var(--received-message-bg);
+    color: var(--received-message-text);
     border-bottom-left-radius: 4px;
     margin-right: 8px;
 }
@@ -411,11 +385,9 @@ body, html {
     margin-right: 8px;
 }
 .message-row.received .message-bubble .message-timestamp {
-    color: #7e7a88; /* Slightly lighter for received timestamp if needed */
+    color: #7e7a88;
 }
 
-
-/* Special style for large emoji messages */
 .message-bubble.message-emoji-large {
     background-color: transparent !important;
     padding: 0;
@@ -429,7 +401,6 @@ body, html {
     color: var(--secondary-text-color);
 }
 
-
 .no-messages {
     text-align: center;
     color: var(--secondary-text-color);
@@ -438,12 +409,11 @@ body, html {
     font-size: 0.9em;
 }
 
-/* Message Input Area */
 .message-input-form {
     display: flex;
     padding: 15px 0px;
     border-top: 1px solid var(--divider-color);
-    background-color: var(--bg-color); /* Match main background */
+    background-color: var(--bg-color);
     flex-shrink: 0;
 }
 
@@ -456,164 +426,5 @@ body, html {
     color: var(--text-color);
     font-size: 0.9em;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.message-input-form input[type="text"]:focus {
-    border-color: var(--input-focus-border-color);
-    box-shadow: 0 0 0 2px rgba(216, 158, 64, 0.2); /* Use accent color for shadow */
-}
-.message-input-form input[type="text"]::placeholder {
-    color: var(--placeholder-text-color);
-}
-
-
-.message-input-form button {
-    padding: 10px 20px;
-    margin-left: 10px;
-    background-color: var(--button-primary-bg); /* Accent color for send button */
-    color: var(--button-primary-text);         /* Dark text for send button */
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600; /* Bold like login button */
-    transition: background-color 0.2s ease;
-}
-
-.message-input-form button:hover:not(:disabled) {
-    background-color: var(--button-primary-hover-bg);
-}
-
-.message-input-form button:disabled {
-    background-color: #a87e3f; /* Darker, desaturated accent from login page */
-    color: rgba(26, 24, 31, 0.7); /* Darker text for disabled */
-    cursor: not-allowed;
-}
-
-/* ... existing CSS ... */
-
-/* Chat Window Header (Recipient Info) */
-.chat-window-header {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px; /* Reduced padding from original 0 20px on chat-window */
-    border-bottom: 1px solid var(--divider-color);
-    background-color: var(--sidebar-bg-color); /* Same as sidebar header for consistency */
-    flex-shrink: 0; /* Prevent shrinking */
-    min-height: 60px; /* Ensure it has some height */
-}
-
-.chat-recipient-avatar {
-    width: 36px; /* Slightly smaller than contact list avatar */
-    height: 36px;
-    border-radius: 50%;
-    margin-right: 12px;
-    background-color: var(--avatar-bg-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--avatar-text-color);
-    font-weight: 500;
-    font-size: 0.85em;
-    flex-shrink: 0;
-}
-.chat-recipient-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-.chat-recipient-avatar .avatar-initials {
-    font-size: 0.9em;
-}
-
-
-.chat-recipient-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-recipient-name {
-    font-size: 1em;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.chat-recipient-status {
-    font-size: 0.8em;
-    color: var(--secondary-text-color);
-}
-
-
-/* Loading messages indicator */
-.chat-loading-messages {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%; /* Take full height of messages container */
-    color: var(--secondary-text-color);
-    font-style: italic;
-}
-.chat-loading-messages p {
-    padding: 20px;
-}
-
-/* Adjust chat-window padding if chat-window-header takes care of it */
-.chat-window {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    /* padding: 0 20px; REMOVE this if header and input have their own padding */
-    padding: 0; /* Let child elements manage padding */
-}
-
-
-/* Ensure input and send button are disabled visually when loading */
-.message-input-form input[type="text"]:disabled,
-.message-input-form button:disabled {
-    /* Styles are already defined for :disabled, just ensure they are applied */
-    cursor: not-allowed;
-    opacity: 0.7; /* Example of visual feedback */
-}
-
-/* ... existing CSS ... */
-
-.chat-window.chat-loading-new-conversation .chat-messages-container {
-  opacity: 0.7; /* Slightly dim old messages while new ones load */
-  /* pointer-events: none; /* Optionally prevent interaction with old messages */
-}
-
-.chat-loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(var(--bg-color-rgb, 33, 31, 38), 0.5); /* Use RGB version of bg-color for transparency */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    color: var(--text-color);
-    font-style: italic;
-}
-/* Add to :root in CSS if you use the rgba trick above */
-/* :root {
-    --bg-color-rgb: 33, 31, 38; 
-} */
-
-
-/* Style for contact item that is being loaded */
-.contact-item.loading-active {
-    background-color: var(--contact-item-hover-bg); /* Similar to hover */
-    /* You could add a subtle animation or border */
-    border-left: 3px solid var(--accent-color); /* Indicate it's the target */
-    opacity: 0.8;
-}
-
-.chat-recipient-status {
-    font-size: 0.8em;
-    color: var(--secondary-text-color);
-    min-height: 1em; /* Prevent layout jump if text changes */
+    transition: border-color 0.2s ease;
 }

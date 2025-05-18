@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import  { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/AuthContext';
 import './LoginPage.css'
@@ -41,11 +41,7 @@ const Login = () => {
         loading: false
       });
 
-      /* Lmao 
-      const encrypted = CryptoJS.AES.encrypt(password, SK).toString();
-      sessionStorage.setItem('password', encrypted);
-      */
-      
+
       //get user
       const userResponse = await axios.get(`${host}/users/me`, {
         headers: {

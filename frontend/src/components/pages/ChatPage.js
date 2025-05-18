@@ -208,11 +208,8 @@ const fetchOrCreateChat = async (recipientId) => {
           const response = await axios.get(`${host}/chat/private/messages/${currentChatId}`, {
             headers: { Authorization: `Bearer ${token}` }, 
           });
-          // console.log("New messages fetched:", response.data);
-          // setMessages(response.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
-          // console.log("[-] response.data:", response);
+        
           const myEncryptedPrivateKeyPem = user.private_key_pem;
-          const myPublicKeyPem = user.public_key_pem;
           const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
 
           const decryptedMessages = await Promise.all(
@@ -225,7 +222,6 @@ const fetchOrCreateChat = async (recipientId) => {
                 const aesKey = decryptAESKeyWithPrivateKey(encryptedKey, myPrivateKeyPem);
                 const plaintext = decryptMessageWithAES(msg.message, aesKey, msg.iv);
 
-                // console.log("Decrypted message:", plaintext);
                 return {
                   ...msg,
                   message: plaintext,
@@ -250,7 +246,6 @@ const fetchOrCreateChat = async (recipientId) => {
 
     socket.onmessage = (event) => {
       const myEncryptedPrivateKeyPem = user.private_key_pem;
-      const myPublicKeyPem = user.public_key_pem;
       const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
 
       const data = JSON.parse(event.data);
@@ -261,9 +256,7 @@ const fetchOrCreateChat = async (recipientId) => {
           : data.encrypted_key_receiver;
 
         const aesKey = decryptAESKeyWithPrivateKey(encryptedAESKey, myPrivateKeyPem);
-        // console.log("Decrypted AES key:", aesKey);
         const plaintext = decryptMessageWithAES(data.message, aesKey, data.iv);
-        // console.log("Decrypted message:", plaintext);
         if (socketRef.current && socketRef.current.url.includes(currentChatId)) {
           setMessages((prevMessages) => [...prevMessages, {
             ...data,
@@ -320,7 +313,6 @@ const fetchOrCreateChat = async (recipientId) => {
     if (messageInput.trim() === '' || !socketRef.current || !isSocketConnected || !selectedRecipient || isLoadingChat || !currentChatId) {
       return;
     }
-    // const messageContent = messageInput;
     try {
       const messageContent = messageInput;
 
@@ -331,7 +323,6 @@ const fetchOrCreateChat = async (recipientId) => {
       const myPublicKeyPem = user.public_key_pem;
       const myEncryptedPrivateKeyPem = user.private_key_pem;
       const myPrivateKeyPem = decryptPrivateKey(myEncryptedPrivateKeyPem, EE2EInput);
-      // console.log("myPrivateKeyPem", myPrivateKeyPem);
 
       if (!receiverPublicKeyPem || !myPrivateKeyPem || !myPublicKeyPem) {
         console.error("Missing keys");

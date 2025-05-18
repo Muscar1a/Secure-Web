@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BsGrid3X3GapFill } from 'react-icons/bs';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { BsChatSquare, BsChatSquareDots } from 'react-icons/bs';
+import { BsChatSquare } from 'react-icons/bs';
 import { FaRegUser, FaUserFriends, FaRegCommentDots, FaRegImage } from 'react-icons/fa';
 import { MdOutlineMailOutline } from 'react-icons/md';
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
