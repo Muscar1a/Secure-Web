@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from api.deps import (
     get_current_active_user,
     get_private_chat_manager
@@ -7,12 +7,13 @@ from serializers.chat_serializers import message_serializer
 from schemas import shared
 from crud.chat import PrivateChatManager
 import schemas
-
-
+from pydantic import constr
+from schemas.user import ObjectIdStr, User
+from schemas.chat import ChatCreationResponse, PrivateChatResponse
 router = APIRouter(prefix='/chat', tags=["Chat"])
 
 async def verify_chat_participant(
-    chat_id: str,
+    chat_id: ObjectIdStr = Path(..., description="24-hex Chat ID"),
     current_user=Depends(get_current_active_user),
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
 ) -> shared.PrivateChatResponseWithRecipient:
@@ -62,7 +63,7 @@ async def get_private_chat(
 @router.get('/private/recipient/chat-id/{recipient_id}',
             response_model=schemas.ChatId)
 async def get_recipient_chat_id(
-    recipient_id: str,
+    recipient_id: ObjectIdStr = Path(..., description="24-hex User ID"),
     pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
@@ -81,18 +82,30 @@ async def get_all_private_chats(
     return await pvt_chat_manager.get_all_chats(current_user.id)
 
 
-@router.get('/private/recipient/create-chat/{recipient_id}',
-            response_model=schemas.PrivateChat)
+@router.get(
+    "/private/recipient/create-chat/{recipient_id}",
+    response_model=ChatCreationResponse,
+    summary="Return existing private chat or create a new one",
+)
 async def create_private_chat(
-    recipient_id: str,
-    pvt_chat_manager: PrivateChatManager = Depends(get_private_chat_manager),
-    current_user: schemas.User = Depends(get_current_active_user)
+    recipient_id: ObjectIdStr = Path(..., description="24-hex User ID"),
+    mgr: PrivateChatManager = Depends(get_private_chat_manager),
+    current_user: User = Depends(get_current_active_user),
 ):
-    try:
-        return await pvt_chat_manager.create_chat(current_user.id, recipient_id)
-    except HTTPException as e:
-        raise e
-    
+    # 1) Try to find an existing chat
+    existing = await mgr.find_private_chat(current_user.id, recipient_id)
+    if existing:
+        return ChatCreationResponse(
+            message="found existing chat",
+            chat=existing
+        )
+
+    # 2) Not found → create a new one
+    new_chat = await mgr.create_chat(current_user.id, recipient_id)
+    return ChatCreationResponse(
+        message="chat not found, creating new chat",
+        chat=new_chat
+    )   
     
 
 @router.get('/private/messages/{chat_id}',

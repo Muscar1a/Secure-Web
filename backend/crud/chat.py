@@ -202,4 +202,24 @@ class PrivateChatManager(BaseChatManager):
             detail='No private message recipients!'
         )
 
+    async def find_private_chat(
+        self,
+        user1_id: str,
+        user2_id: str   
+    ) -> schemas.PrivateChat | None:
+        """
+        Return the existing private chat between user1_id and user2_id, or None if none exists.
+        """
+        raw = await self.chat_collection.find_one({
+            "type": "private",
+            "member_ids": {"$all": [user1_id, user2_id]},
+        })
+        if not raw:
+            return None
+
+        # normalize Mongo's _id → 24-hex id
+        raw["id"] = str(raw["_id"])
+        raw.pop("_id", None)
+
+        return schemas.PrivateChat(**raw)
 

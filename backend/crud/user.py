@@ -10,7 +10,7 @@ from schemas import (
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from exceptions import UserCreationError
 from core.config import settings
-
+from bson import ObjectId 
 
 class BaseUserManager:
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -18,10 +18,21 @@ class BaseUserManager:
         self.user_collection = self.db['users']
 
     async def get_by_id(self, id: str) -> UserInDb:
-        user = await self.user_collection.find_one({'id': id})
+        # 1) ensure it’s a valid 24-hex string and convert
+        try:
+            oid = ObjectId(id)
+        except Exception:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail="Invalid user ID format"
+            )
+        # 2) lookup by the real _id
+        user = await self.user_collection.find_one({'_id': oid})
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f'User not found')
+        user["id"] = str(user["_id"])
+        user.pop("_id", None)
         return user
 
     async def get_by_email(self, email: str) -> UserInDb:
@@ -71,9 +82,9 @@ class UserDBManager(BaseUserManager):
 class UserCreator(BaseUserManager):
     async def create_user(self, user_data: UserCreate) -> UserInDb:
         """Create a new user with hashed password."""
-        existing_user = await self.get_by_username(user_data.username)
-        if existing_user:
-            raise UserCreationError('Email', 'Email already in use!')
+        existing = await self.user_collection.find_one({'username': user_data.username})
+        if existing:
+            raise UserCreationError('username', 'Username already in use!')
         password_hash = get_password_hash(user_data.password)
         updated_user_data = {
             **user_data.model_dump(),
@@ -81,9 +92,11 @@ class UserCreator(BaseUserManager):
             "roles": ["user"],
         }
         new_user = UserModel(**updated_user_data)
-        result = await self.user_collection.insert_one(new_user.model_dump())
+        payload  = new_user.model_dump(exclude={"id"})
+        result   = await self.user_collection.insert_one(payload)
         if result.acknowledged:
-            return await self.get_by_id(new_user.id)
+            oid_str = str(result.inserted_id)
+            return await self.get_by_id(oid_str)
 
         raise UserCreationError('User creation failed', 'Write not acknowledged')
 
@@ -91,8 +104,13 @@ class UserCreator(BaseUserManager):
 class UserUpdater(BaseUserManager):
     async def update_user(self, updated_data: UserUpdate) -> UserInDb:
         """Update user data."""
+        # validate & cast
+        try:
+            oid = ObjectId(updated_data.id)
+        except:
+            raise HTTPException(400, "Invalid user ID format")
         result = await self.user_collection.update_one(
-            {'id': updated_data.id},
+            {'_id': oid},
             {'$set': updated_data.model_dump()}
         )
 
@@ -105,7 +123,7 @@ class UserDeleter(BaseUserManager):
     async def delete_user(self, id: str) -> dict:
         """Delete a user by ID."""
         user = await self.get_by_id(id)
-        deleted = await self.user_collection.delete_one({'id': id})
+        deleted = await self.user_collection.delete_one({'id': ObjectId(id)})
 
         if deleted.deleted_count == 0:
             raise HTTPException(

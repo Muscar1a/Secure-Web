@@ -103,28 +103,37 @@ const ChatPage = () => {
     }
   };
 
-  const fetchOrCreateChat = async (recipientId) => {
-    console.log("--> fetchOrCreateChat called with recipientId:", recipientId);
-    try {
-      const response = await axios.get(`${host}/chat/private/recipient/chat-id/${recipientId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Fetched existing chat ID:", response.data.chat_id);
-      return response.data.chat_id;
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        console.log("Chat not found, creating new chat via GET (as per original).");
-        const createResponse = await axios.get(`${host}/chat/private/recipient/create-chat/${recipientId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log("Chat created (via GET):", createResponse.data);
-        return createResponse.data.chat_id;
-      } else {
-        console.error("Error fetching/creating chat:", error.response?.data || error.message, error);
-        throw error; 
-      }
+const fetchOrCreateChat = async (recipientId) => {
+  console.log("--> fetchOrCreateChat called with recipientId:", recipientId);
+  try {
+    // 1) Try the “already exists” route
+    const response = await axios.get(
+      `${host}/chat/private/recipient/chat-id/${recipientId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log("Fetched existing chat ID:", response.data.chat_id);
+    return response.data.chat_id;
+  } catch (error) {
+    // 2) Not found → create one
+    if (error.response?.status === 404) {
+      console.log("Chat not found, creating new chat via GET (as per original).");
+      const createResponse = await axios.get(
+        `${host}/chat/private/recipient/create-chat/${recipientId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Chat created (via GET):", createResponse.data);
+
+      // **PICK THE NESTED chat_id**
+      const newChatId = createResponse.data.chat.chat_id;
+      console.log("Extracted new chat ID:", newChatId);
+      return newChatId;
     }
-  };
+
+    // any other error, rethrow
+    console.error("Error fetching/creating chat:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
   const handleSelectContact = async (contact) => {
     if (selectedRecipient?.id === contact.id && !isLoadingChat) return;

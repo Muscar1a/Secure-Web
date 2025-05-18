@@ -1,11 +1,23 @@
 import re
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, constr
 from typing import Optional
 
 from schemas.chat import MessageRecipient
 
+ObjectIdStr = constr(
+    min_length=24,
+    max_length=24,
+    pattern=r"^[0-9a-fA-F]{24}$"
+)
+
+UsernameStr = constr(
+    min_length=3,
+    max_length=30,
+    pattern=r"^[A-Za-z0-9_]+$"
+)
+
 class UserBase(BaseModel):
-    username: str
+    username: UsernameStr
     email: str
 
     public_key_pem: str
@@ -35,7 +47,7 @@ class UserCreate(UserBase):
     
     
 class UserRead(UserBase):
-    id: str
+    id: ObjectIdStr
     first_name: str | None
     last_name: str | None
     is_active: bool
@@ -46,7 +58,7 @@ User = UserRead
 
 class UserUpdate(BaseModel):
     id: str
-    username: Optional[str]   = None
+    username: Optional[UsernameStr]   = None
     email: Optional[str]      = None
     first_name: Optional[str] = None
     last_name: Optional[str]  = None
