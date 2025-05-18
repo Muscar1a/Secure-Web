@@ -6,7 +6,8 @@ import re
 from jose import JWTError
 from datetime import datetime
 import datetime
-from datetime import timezone
+from datetime import datetime, timezone, timedelta
+
 
 from api.deps import get_token_manager, get_user_manager, get_current_active_user
 from services.token import TokenManager
@@ -107,7 +108,7 @@ async def reset_password(
     if (
         not token_doc
         or token_doc["used"]
-        or token_doc["expires_at"] < datetime.now(timezone.utc) 
+        or token_doc["expires_at"] < datetime.utcnow()
     ):
         raise HTTPException(400, "Invalid or expired token")
 

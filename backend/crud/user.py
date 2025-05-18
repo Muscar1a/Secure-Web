@@ -36,7 +36,14 @@ class BaseUserManager:
         return user
 
     async def get_by_email(self, email: str) -> UserInDb:
-        return await self.user_collection.find_one({'email': email})
+        doc = await self.user_collection.find_one({"email": email})
+        if not doc:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f'User not found')
+        doc["id"] = str(doc["_id"])
+        doc.pop("_id", None)
+        return doc
+
 
     async def get_by_username(self, username: str) -> UserInDb:
         user = await self.user_collection.find_one({'username': username})
@@ -94,7 +101,6 @@ class UserCreator(BaseUserManager):
         }
         new_user = UserModel(**updated_user_data)
         payload  = new_user.model_dump(exclude={"id"})
-        print("📦 create_user payload:", payload)
         result   = await self.user_collection.insert_one(payload)
         if result.acknowledged:
             oid_str = str(result.inserted_id)
