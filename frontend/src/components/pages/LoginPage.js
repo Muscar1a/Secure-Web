@@ -21,12 +21,16 @@ const Login = () => {
 
     try {
       //format to FormData to work with FastAPI
-      const formData = new FormData();
-      formData.append('username', username);
-      formData.append('password', password);
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('password', password);
 
-      const response = await axios.post(`${host}/auth/token`, formData);
-      
+      const response = await axios.post(
+        `${host}/auth/token`,
+        params,
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
       //save token to localStorage
       localStorage.setItem('token', response.data.access_token);
       

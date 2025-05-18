@@ -50,3 +50,7 @@ class GroupChat(ChatBase):
 class GroupChatResponse(GroupChat):
     pass
 
+
+class ChatCreationResponse(BaseModel):
+    message: str
+    chat: PrivateChat

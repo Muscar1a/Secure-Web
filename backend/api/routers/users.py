@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path, Body
 from typing import Any
 from services.token import TokenManager
 from exceptions.user import UserCreationError
@@ -11,11 +11,15 @@ from api.deps import (
     get_user_manager,
     requires_role
 )
-
+from pydantic import constr
+from schemas.user import ObjectIdStr, UsernameStr
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.post("/register", response_model=schemas.User)
+@router.post(
+        "/register",
+        response_model=schemas.User
+)
 async def register(
     user_in: schemas.UserCreate,
     user_manager: User = Depends(get_user_manager),
@@ -42,7 +46,10 @@ async def register(
 
         
         
-@router.get("/me", response_model=schemas.User)
+@router.get(
+        "/me",
+        response_model=schemas.User
+)
 async def read_me(
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user)
@@ -51,9 +58,12 @@ async def read_me(
     return user
 
 
-@router.get('/info/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.User)
+@router.get(
+        '/info/{user_id}',
+        status_code=status.HTTP_200_OK, response_model=schemas.User
+)       
 async def get_user_detail(
-    user_id: str,
+    user_id: ObjectIdStr = Path(..., description="24-hex User ID"),
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user)
 ):
@@ -69,7 +79,7 @@ async def get_user_detail(
     status_code=status.HTTP_200_OK,
 )
 async def get_user_by_username(
-    username: str,
+    username: UsernameStr = Path(..., description="Alphanumeric username"),
     user_manager: User = Depends(get_user_manager),
     current_user: schemas.User = Depends(get_current_active_user),
 ):
@@ -91,19 +101,32 @@ async def get_all_user(
     # any authenticated user can now list all others (except themselves)
     return await user_manager.get_all_except_me(current_user.id)
 
-@router.put('/update/info/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.User)
+@router.put(
+        '/update/info/{user_id}',
+        status_code=status.HTTP_200_OK,
+        response_model=schemas.User
+)
 async def update_user(
-    user_id: str,
-    updated_data: schemas.UserUpdate,
+    user_id: ObjectIdStr = Path(
+        ...,
+        description="24-hex User ID"
+    ),
+    updated_data: schemas.UserUpdate = Body(
+        ...,
+        description="User data to update"
+    ),
     user_manager: User = Depends(get_user_manager),
     _: schemas.User = Depends(requires_role("admin"))
 ):
     user = await user_manager.update_user(user_id, updated_data)
     return user
 
-@router.delete('/delete/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+        '/delete/{user_id}',
+        status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_user(
-    user_id: str,
+    user_id: ObjectIdStr = Path(..., description="24-hex User ID"),
     user_manager: User = Depends(get_user_manager),
     _: schemas.User = Depends(requires_role("admin"))
 ):

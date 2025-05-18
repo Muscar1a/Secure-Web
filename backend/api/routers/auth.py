@@ -43,7 +43,7 @@ async def login_for_access_token(
             status.HTTP_401_UNAUTHORIZED,
             "Incorrect username or password",
         )
-    subject = user.get('id')
+    subject = str(user['_id'])
     """
         Here we use id for further access token generation.
     """
