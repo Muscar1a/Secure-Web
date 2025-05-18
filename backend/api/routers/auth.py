@@ -5,6 +5,8 @@ from pydantic import BaseModel, EmailStr, field_validator
 import re
 from jose import JWTError
 from datetime import datetime
+import datetime
+from datetime import timezone
 
 from api.deps import get_token_manager, get_user_manager
 from services.token import TokenManager
@@ -105,7 +107,7 @@ async def reset_password(
     if (
         not token_doc
         or token_doc["used"]
-        or token_doc["expires_at"] < datetime.utcnow()
+        or token_doc["expires_at"] < datetime.now(timezone.utc) 
     ):
         raise HTTPException(400, "Invalid or expired token")
 
