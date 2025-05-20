@@ -60,14 +60,15 @@ User = UserRead
 
 class UserUpdate(BaseModel):
     id: str
-    username: Optional[UsernameStr]   = None
-    email: Optional[str]      = None
-    first_name: Optional[str] = None
-    last_name: Optional[str]  = None
-    is_active: Optional[bool] = None
-    is_disabled: Optional[bool] = None
+    # username: Optional[UsernameStr] = None
+    # email: Optional[str]      = None
+    # first_name: Optional[str] = None
+    # last_name: Optional[str]  = None
+    # is_active: Optional[bool] = None
+    # is_disabled: Optional[bool] = None
     password: Optional[str]   = None
-    roles:    Optional[list[str]] = None
+    # roles:    Optional[list[str]] = None
+    
 class UserInDb(UserRead):
     private_message_recipients: list[MessageRecipient | None]
     group_chat_ids: list[str | None]
